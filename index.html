@@ -1,0 +1,2305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Neo-Melody · Requiem: Binary — El álbum conceptual</title>
+<meta name="description" content="Requiem: Binary — Echoes of Two Realms. Álbum conceptual de Neo-Melody: dos reinos (victoriano × cyberpunk), dos voces (Yumeki × Kageki), un solo caos." />
+<meta name="theme-color" content="#0a0a0e" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0e'/%3E%3Cpath d='M14 46V18l18 20V18' stroke='%23ff0055' stroke-width='5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M36 46h14M36 34h11' stroke='%2300e5ff' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E" />
+
+<!-- Tipografías: Cinzel (títulos, aire victoriano) + JetBrains Mono (código/hacker) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<!-- Iconos Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+<!-- Tailwind (CDN oficial) + configuración de la paleta Cyber-Gótica -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          void: "#0a0a0e",      /* Fondo principal (90%) */
+          gothic: "#14141c",    /* Contenedores y tarjetas */
+          panel: "#1b1b26",     /* Tarjetas elevadas / hover */
+          crimson: { DEFAULT: "#ff0055", soft: "#ff3366" }, /* Acento Binary */
+          "cyan-neon": "#00e5ff", /* Acento Réquiem */
+          bone: "#e2e2e9",      /* Texto principal */
+          dim: "#8a8a99",       /* Texto secundario */
+          gold: "#d9a441",      /* Dorado sutil */
+        },
+        fontFamily: {
+          display: ["Cinzel", "Playfair Display", "Georgia", "serif"],
+          code: ["JetBrains Mono", "Fira Code", "monospace"],
+        },
+        /* Escalas que la maqueta original usa con opacidades libres */
+        opacity: { 8: "0.08", 12: "0.12", 65: "0.65", 75: "0.75", 85: "0.85", 97: "0.97" },
+        transitionDuration: { 400: "400ms" },
+      },
+    },
+  };
+</script>
+
+<!-- GSAP + ScrollTrigger (paralaje y tilt) · Anime.js (partículas de clic) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js"></script>
+
+<style>
+  /* ==========================================================================
+     NEO-MELODY · PALETA CYBER-GÓTICA — estilos propios del sitio
+     ========================================================================== */
+  :root {
+    --font-code: "JetBrains Mono", "Fira Code", monospace;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: #0a0a0e;
+    color: #e2e2e9;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: rgba(255, 0, 85, 0.35); color: #fff; }
+
+  /* Barra de scroll personalizada — doble color del álbum */
+  ::-webkit-scrollbar { width: 9px; height: 9px; }
+  ::-webkit-scrollbar-track { background: #0a0a0e; }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #ff0055, #00e5ff);
+    border-radius: 8px;
+    border: 2px solid #0a0a0e;
+  }
+
+  /* ==========================================================================
+     CURSOR PERSONALIZADO DE DOS CAPAS
+     · Punto azul medianoche: tracking directo (sin delay)
+     · Anillo: sigue con resorte suave al 15% de interpolación por frame
+     · Sobre fichas: el punto crece y se vuelve blanco, el anillo se expande a
+       72px con glow dorado y aparece un ojo. Transiciones cubic-bezier(.22,1,.36,1)
+     · En móvil (sin puntero fino) se oculta todo y vuelve el cursor nativo.
+     ========================================================================== */
+  @media (pointer: fine) {
+    html.custom-cursor, html.custom-cursor * { cursor: none !important; }
+  }
+  .cursor-dot, .cursor-ring {
+    position: fixed; top: 0; left: 0; z-index: 100;
+    pointer-events: none; will-change: transform;
+  }
+  .cursor-dot {
+    width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 9999px;
+    background: #2743d6; /* azul medianoche */
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.85), 0 0 3px rgba(255, 255, 255, 0.9) inset;
+    transition:
+      width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      height 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      margin 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.3s ease;
+  }
+  .cursor-ring {
+    width: 38px; height: 38px; margin: -19px 0 0 -19px; border-radius: 9999px;
+    border: 1.5px solid rgba(226, 226, 233, 0.4);
+    display: flex; align-items: center; justify-content: center;
+    transition:
+      width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      height 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      margin 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.3s ease;
+  }
+  .cursor-ring i {
+    font-size: 13px; color: #d9a441; opacity: 0; transform: scale(0.4);
+    transition:
+      opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  html.cursor-sobre-ficha .cursor-dot {
+    width: 16px; height: 16px; margin: -8px 0 0 -8px; background: #fff;
+    box-shadow: 0 0 14px rgba(255, 255, 255, 0.7);
+  }
+  html.cursor-sobre-ficha .cursor-ring {
+    width: 72px; height: 72px; margin: -36px 0 0 -36px;
+    border-color: rgba(217, 164, 65, 0.85);
+    background: rgba(217, 164, 65, 0.04);
+    box-shadow: 0 0 22px rgba(217, 164, 65, 0.35), inset 0 0 14px rgba(217, 164, 65, 0.18);
+  }
+  html.cursor-sobre-ficha .cursor-ring i { opacity: 1; transform: scale(1); }
+  html.cursor-fuera .cursor-dot, html.cursor-fuera .cursor-ring { opacity: 0; }
+  @media (pointer: coarse) { .cursor-dot, .cursor-ring { display: none; } }
+
+  /* Partículas de luz al hacer clic (Anime.js) */
+  .particula {
+    position: fixed; z-index: 95; width: 6px; height: 6px;
+    margin: -3px 0 0 -3px; border-radius: 2px;
+    pointer-events: none; will-change: transform, opacity;
+  }
+
+  /* ==========================================================================
+     SHIMMER GRADIENT — brillo metálico que viaja por las letras (solo CSS)
+     ========================================================================== */
+  .shimmer-text {
+    background: linear-gradient(120deg, #ff0055 0%, #e2e2e9 18%, #ff3366 34%, #00e5ff 52%, #e2e2e9 70%, #ff0055 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+    animation: shimmer 6s linear infinite;
+  }
+  @keyframes shimmer { 0% { background-position: 200% center; } 100% { background-position: -200% center; } }
+
+  /* Texto fantasma gigante (contorno) para fondos tipográficos */
+  .texto-fantasma { -webkit-text-stroke: 1px rgba(226, 226, 233, 0.07); color: transparent; user-select: none; }
+
+  /* ==========================================================================
+     GLITCH HOVER — estática digital al pasar el cursor (solo CSS)
+     ========================================================================== */
+  .glitch-zone { position: relative; overflow: hidden; }
+  .glitch-zone::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+    background: repeating-linear-gradient(0deg, rgba(255,0,85,0.05) 0px, rgba(255,0,85,0.05) 1px, transparent 1px, transparent 3px);
+    transition: opacity 0.25s ease;
+  }
+  .glitch-zone:hover::before { opacity: 1; animation: estatica 0.4s steps(4, jump-none) infinite; }
+  @keyframes estatica { 0% { transform: translateY(0); } 50% { transform: translateY(-3px); } 100% { transform: translateY(0); } }
+  .glitch-zone:hover .glitch-text { animation: glitch-desplazamiento 0.5s steps(2, jump-none) infinite; }
+  @keyframes glitch-desplazamiento {
+    0% { text-shadow: 2px 0 rgba(255,0,85,0.8), -2px 0 rgba(0,229,255,0.8); }
+    50% { text-shadow: -2px 0 rgba(255,0,85,0.8), 2px 0 rgba(0,229,255,0.8); transform: translateX(1px); }
+    100% { text-shadow: 2px 0 rgba(255,0,85,0.8), -2px 0 rgba(0,229,255,0.8); }
+  }
+
+  /* ==========================================================================
+     TERMINAL DE KAGEKI — líneas de código carmesí
+     ========================================================================== */
+  .terminal {
+    position: relative;
+    background: radial-gradient(ellipse at 70% 0%, rgba(255,0,85,0.08), transparent 55%), #0d0d14;
+  }
+  .terminal::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 4px);
+  }
+  .linea-codigo {
+    font-family: var(--font-code); font-size: 11px; line-height: 1.7;
+    color: rgba(255, 51, 102, 0.75); white-space: nowrap; overflow: hidden;
+  }
+  .cursor-parpadeo::after { content: "▊"; margin-left: 2px; color: #ff0055; animation: parpadeo 1s steps(1) infinite; }
+  @keyframes parpadeo { 50% { opacity: 0; } }
+
+  /* ==========================================================================
+     MARQUEE — cinta de palabras en movimiento continuo
+     ========================================================================== */
+  .marquee { overflow: hidden; mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent); }
+  .marquee-track { display: flex; gap: 3rem; width: max-content; animation: marquee 30s linear infinite; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ==========================================================================
+     REVEAL ON SCROLL — estados iniciales y transición (IntersectionObserver)
+     ========================================================================== */
+  [data-reveal] {
+    opacity: 0; transform: translateY(44px);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+  [data-reveal].revelado { opacity: 1; transform: none; }
+  [data-reveal-group] > * {
+    opacity: 0; transform: translateY(36px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+  [data-reveal-group].revelado > * { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    [data-reveal], [data-reveal-group] > * { opacity: 1 !important; transform: none !important; transition: none !important; }
+  }
+
+  /* Ornamentos de esquina estilo gótico (paneles de Yumeki) */
+  .esquina-gotica { position: absolute; width: 26px; height: 26px; border-color: rgba(0, 229, 255, 0.5); pointer-events: none; }
+
+  /* Sello de cera — letras clasificadas */
+  .sello-cera {
+    background: radial-gradient(circle at 35% 30%, #ff3366, #99002f 65%, #5c0020);
+    box-shadow: 0 4px 14px rgba(255,0,85,0.35), inset 0 -3px 8px rgba(0,0,0,0.45), inset 0 2px 6px rgba(255,255,255,0.18);
+  }
+
+  /* Anillo giratorio decorativo (glifo binario) */
+  .glifo-giratorio { animation: giro-lento 14s linear infinite; }
+  @keyframes giro-lento { to { transform: rotate(360deg); } }
+
+  /* Flotación suave para la portada del hero */
+  .flotando { animation: flotando 7s ease-in-out infinite; }
+  @keyframes flotando { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+
+  /* Indicador de scroll del hero */
+  .indicador-scroll { animation: rebote 1.8s ease-in-out infinite; }
+  @keyframes rebote {
+    0%, 100% { transform: translateY(0); opacity: 0.9; }
+    50% { transform: translateY(8px); opacity: 0.4; }
+  }
+
+  /* Barra de progreso con rayado animado (novela visual) */
+  .barra-textura {
+    background-image: repeating-linear-gradient(-45deg, rgba(255,255,255,0.14) 0px, rgba(255,255,255,0.14) 6px, transparent 6px, transparent 12px);
+    background-size: 200% 100%;
+    animation: textura 3s linear infinite;
+  }
+  @keyframes textura { to { background-position: 200% 0; } }
+
+  /* Criptograma de Yumeki (Bloque 4 — mini interacción traída de B) */
+  input[type="range"] { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 9999px;
+    background: linear-gradient(90deg, #ff0055, #00e5ff); outline: none; }
+  input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 9999px;
+    background: #e2e2e9; border: 3px solid #0a0a0e; box-shadow: 0 0 0 2px #00e5ff, 0 0 14px rgba(0,229,255,0.6); cursor: pointer; }
+  input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 9999px; background: #e2e2e9;
+    border: 3px solid #0a0a0e; box-shadow: 0 0 0 2px #00e5ff, 0 0 14px rgba(0,229,255,0.6); cursor: pointer; }
+  .msg-listo { color: #7df3ff !important; text-shadow: 0 0 12px rgba(0,229,255,0.45); }
+  .estado-lista { color: #00e5ff !important; }
+  .cripto-listo { border-color: rgba(0,229,255,0.8) !important; color: #00e5ff !important;
+    background: rgba(0,229,255,0.08) !important; box-shadow: 0 0 24px rgba(0,229,255,0.5); }
+  @keyframes shake-anim { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+  .shake { animation: shake-anim 0.4s ease; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shimmer-text, .marquee-track, .flotando, .indicador-scroll, .glifo-giratorio, .barra-textura { animation: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body class="bg-void text-bone">
+<!-- ================= SISTEMAS DE FONDO ================= -->
+<!-- Canvas: ondas de radio concéntricas reactivas al ratón -->
+<canvas id="ondas-fondo" aria-hidden="true" class="pointer-events-none fixed inset-0 z-0 opacity-90"></canvas>
+<!-- Contenedor de partículas de clic (Anime.js) -->
+<div id="particulas" aria-hidden="true"></div>
+<!-- Cursor personalizado de dos capas (invisibles en móvil) -->
+<div id="cursor-dot" class="cursor-dot" aria-hidden="true"></div>
+<div id="cursor-ring" class="cursor-ring" aria-hidden="true"><i class="fa-solid fa-eye"></i></div>
+
+<!-- ================= NAVEGACIÓN ================= -->
+<header id="barra-nav" class="fixed inset-x-0 top-0 z-40 transition-all duration-500 bg-transparent">
+  <nav class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6" aria-label="Principal">
+    <!-- Monograma dual del proyecto. REEMPLAZA TU LOGO: guarda tu archivo como
+         images/logo.png (mismo nombre) y listo — no hay que tocar código. -->
+    <a href="#inicio" class="group flex items-center gap-2.5" data-cursor>
+      <span class="grid size-9 shrink-0 place-items-center overflow-hidden rounded-full border border-white/15 bg-gothic">
+        <img src="images/logo.png" alt="Logotipo de Neo-Melody" class="size-full object-cover transition-transform duration-500 group-hover:scale-110" />
+      </span>
+      <span class="font-display text-sm font-bold tracking-[0.22em] text-bone max-sm:hidden">
+        NEO<span class="text-crimson">—</span>MELODY
+      </span>
+    </a>
+    <!-- Enlaces de escritorio -->
+    <ul class="hidden items-center gap-7 md:flex">
+      <li><a href="#inicio" data-cursor class="font-code text-[11px] uppercase tracking-[0.25em] text-dim transition-colors duration-300 hover:text-cyan-neon">Inicio</a></li>
+      <li><a href="#escucha" data-cursor class="font-code text-[11px] uppercase tracking-[0.25em] text-dim transition-colors duration-300 hover:text-cyan-neon">Escucha</a></li>
+      <li><a href="#archivo" data-cursor class="font-code text-[11px] uppercase tracking-[0.25em] text-dim transition-colors duration-300 hover:text-cyan-neon">Archivo</a></li>
+      <li><a href="#letras" data-cursor class="font-code text-[11px] uppercase tracking-[0.25em] text-dim transition-colors duration-300 hover:text-cyan-neon">Letras</a></li>
+      <li><a href="#tienda" data-cursor class="font-code text-[11px] uppercase tracking-[0.25em] text-dim transition-colors duration-300 hover:text-cyan-neon">Tienda</a></li>
+      <li><a href="#proyectos" data-cursor class="font-code text-[11px] uppercase tracking-[0.25em] text-dim transition-colors duration-300 hover:text-cyan-neon">Proyectos</a></li>
+    </ul>
+    <div class="flex items-center gap-2">
+      <!-- Botón de carrito con insignia de cantidad -->
+      <button type="button" id="btn-abrir-carrito" data-cursor
+        aria-label="Abrir carrito, 0 artículos"
+        class="relative grid size-10 place-items-center rounded-full border border-white/10 bg-gothic/70 text-bone transition-all duration-300 hover:border-crimson/60 hover:text-crimson">
+        <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+        <span id="badge-carrito" class="absolute -right-1 -top-1 hidden size-5 place-items-center rounded-full bg-crimson font-code text-[10px] font-bold text-white shadow-[0_0_10px_rgba(255,0,85,0.7)]"></span>
+      </button>
+      <!-- Hamburguesa móvil -->
+      <button type="button" id="btn-menu" data-cursor aria-label="Abrir menú" aria-expanded="false"
+        class="grid size-10 place-items-center rounded-full border border-white/10 bg-gothic/70 text-bone transition-colors hover:border-cyan-neon/60 hover:text-cyan-neon md:hidden">
+        <i id="icono-menu" class="fa-solid fa-bars" aria-hidden="true"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<!-- Menú móvil a pantalla completa -->
+<div id="menu-movil" class="fixed inset-0 z-30 flex flex-col items-center justify-center gap-2 bg-void/97 backdrop-blur-xl transition-all duration-500 invisible opacity-0 md:hidden">
+  <a href="#inicio"   class="enlace-menu font-display text-3xl font-bold tracking-wide text-bone transition-all duration-500 hover:text-cyan-neon translate-y-6 opacity-0" style="transition-delay:0ms">Inicio</a>
+  <a href="#escucha"  class="enlace-menu font-display text-3xl font-bold tracking-wide text-bone transition-all duration-500 hover:text-cyan-neon translate-y-6 opacity-0" style="transition-delay:60ms">Escucha</a>
+  <a href="#archivo"  class="enlace-menu font-display text-3xl font-bold tracking-wide text-bone transition-all duration-500 hover:text-cyan-neon translate-y-6 opacity-0" style="transition-delay:120ms">Archivo</a>
+  <a href="#letras"   class="enlace-menu font-display text-3xl font-bold tracking-wide text-bone transition-all duration-500 hover:text-cyan-neon translate-y-6 opacity-0" style="transition-delay:180ms">Letras</a>
+  <a href="#tienda"   class="enlace-menu font-display text-3xl font-bold tracking-wide text-bone transition-all duration-500 hover:text-cyan-neon translate-y-6 opacity-0" style="transition-delay:240ms">Tienda</a>
+  <a href="#proyectos" class="enlace-menu font-display text-3xl font-bold tracking-wide text-bone transition-all duration-500 hover:text-cyan-neon translate-y-6 opacity-0" style="transition-delay:300ms">Proyectos</a>
+  <p class="mt-8 font-code text-[10px] uppercase tracking-[0.3em] text-dim">Requiem: Binary — Vol. 1</p>
+</div>
+
+<main class="relative z-10">
+  <!-- ================= BLOQUE 1 · HERO ================= -->
+  <section id="inicio" class="relative flex min-h-svh items-center overflow-hidden pt-24 pb-16" aria-label="Presentación del álbum">
+    <!-- Halo doble de fondo — la dualidad como luz -->
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0">
+      <div class="absolute -left-40 top-1/4 size-[34rem] rounded-full bg-crimson/10 blur-[130px]"></div>
+      <div class="absolute -right-40 bottom-1/4 size-[34rem] rounded-full bg-cyan-neon/10 blur-[130px]"></div>
+    </div>
+    <!-- Palabra fantasma gigante de fondo -->
+    <span aria-hidden="true" class="texto-fantasma pointer-events-none absolute left-1/2 top-16 -translate-x-1/2 font-display text-[19vw] font-black leading-none tracking-tight max-lg:text-[24vw]">N×K</span>
+
+    <div class="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-14 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
+      <!-- Columna de texto -->
+      <div class="order-2 text-center lg:order-1 lg:text-left">
+        <p data-hero-overline class="mb-5 font-code text-[11px] uppercase tracking-[0.4em] text-dim">
+          Neo-Melody <span class="text-crimson">presenta</span> el álbum conceptual
+        </p>
+        <h1 data-hero-titulo class="font-display text-5xl font-black leading-[1.05] tracking-wide sm:text-6xl lg:text-7xl">
+          <span class="shimmer-text">REQUIEM: BINARY</span>
+        </h1>
+        <p data-hero-sub class="mx-auto mt-6 max-w-xl font-code text-sm leading-relaxed text-dim lg:mx-0">
+          <span class="text-cyan-neon">Echoes of Two Realms</span> — Vol. 1<br />
+          Réquiem (victoriano, melancolía, piano y violín) × Binary (cyberpunk, glitches, math rock). Dos reinos que se cruzaron desatando el caos.
+        </p>
+        <!-- Botones duales de neón (el botón de Spotify se añade solo desde CONFIG) -->
+        <div id="botones-hero" class="mt-9 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
+          <a href="#escucha" data-hero-btn data-cursor class="group inline-flex items-center gap-3 rounded-full border border-crimson/70 bg-crimson/10 px-7 py-3.5 font-code text-xs font-bold uppercase tracking-[0.2em] text-crimson-soft transition-all duration-300 hover:bg-crimson hover:text-white hover:shadow-[0_0_28px_rgba(255,0,85,0.45)]">
+            <i class="fa-solid fa-play transition-transform duration-300 group-hover:scale-110" aria-hidden="true"></i>
+            Escuchar Sencillo
+          </a>
+          <a href="#archivo" data-hero-btn data-cursor class="group inline-flex items-center gap-3 rounded-full border border-cyan-neon/70 bg-cyan-neon/10 px-7 py-3.5 font-code text-xs font-bold uppercase tracking-[0.2em] text-cyan-neon transition-all duration-300 hover:bg-cyan-neon hover:text-void hover:shadow-[0_0_28px_rgba(0,229,255,0.45)]">
+            <i class="fa-solid fa-book-skull transition-transform duration-300 group-hover:scale-110" aria-hidden="true"></i>
+            Explorar el Lore
+          </a>
+        </div>
+      </div>
+
+      <!-- Columna de la portada -->
+      <div class="order-1 flex justify-center lg:order-2">
+        <div class="relative w-64 sm:w-80 lg:w-full lg:max-w-md">
+          <div data-hero-portada data-tilt data-cursor class="flotando relative aspect-square overflow-hidden rounded-2xl border border-white/10 shadow-[0_0_70px_rgba(255,0,85,0.16),0_0_120px_rgba(0,229,255,0.12)]">
+            <img src="images/cover.jpg" alt="Portada del álbum Requiem: Binary — Yumeki y Kageki de espaldas, entre un castillo victoriano y una ciudad cyberpunk" class="absolute inset-0 h-full w-full object-cover" />
+            <span class="absolute left-4 top-4 rounded-full border border-white/20 bg-void/70 px-3 py-1 font-code text-[10px] uppercase tracking-[0.25em] text-bone backdrop-blur-sm">Vol. 1</span>
+            <span aria-hidden="true" class="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-cyan-neon via-bone to-crimson"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Indicador de scroll -->
+    <a href="#escucha" data-hero-indicador data-cursor aria-label="Bajar a la sala de escucha" class="indicador-scroll absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-dim transition-colors hover:text-cyan-neon">
+      <i class="fa-solid fa-chevron-down text-xl" aria-hidden="true"></i>
+    </a>
+  </section>
+
+  <!-- Cinta dual de palabras -->
+  <div class="marquee relative border-y border-white/5 bg-gothic/60 py-4" aria-hidden="true">
+    <div class="marquee-track" id="cinta"></div>
+  </div>
+
+  <!-- ================= BLOQUE 2 · SALA DE ESCUCHA ================= -->
+  <section id="escucha" class="relative py-24 sm:py-28" aria-label="Sala de escucha">
+    <div aria-hidden="true" class="absolute inset-x-0 top-0 h-full bg-gothic/45"></div>
+    <div class="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
+      <div id="cabecera-escucha"></div>
+      <article id="sencillo-card" class="mb-12"></article>
+      <div id="control-letras" class="mb-6"></div>
+      <ol id="tracklist" class="space-y-3" data-reveal-group></ol>
+      <div id="spotify-embed-slot" class="mt-10"></div>
+    </div>
+  </section>
+
+  <!-- ================= BLOQUE 3 · EL ARCHIVO BINARY ================= -->
+  <section id="archivo" class="relative py-24 sm:py-28" aria-label="Archivo Binary — lore del universo">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6">
+      <div id="cabecera-archivo"></div>
+
+      <!-- Banner de La Grieta con paralaje -->
+      <div data-reveal class="relative mb-20 overflow-hidden rounded-2xl border border-white/10">
+        <div class="relative aspect-[16/10] sm:aspect-[21/8]">
+          <img src="images/grieta.png" data-parallax="8" alt="La Grieta: catedral victoriana y torres cyberpunk partidas por un rayo doble cyan y carmesí" class="absolute inset-0 h-full w-full scale-110 object-cover" />
+          <div class="absolute inset-0 bg-gradient-to-t from-void via-void/35 to-transparent" aria-hidden="true"></div>
+        </div>
+        <div class="p-6 sm:absolute sm:inset-x-0 sm:bottom-0 sm:p-10">
+          <p class="font-code text-[10px] uppercase tracking-[0.4em] text-cyan-neon">Expediente 000 — Incidente fundacional</p>
+          <h3 class="mt-2 max-w-2xl font-display text-2xl font-black leading-snug text-bone sm:text-4xl">La Noche del Doble Eclipse</h3>
+          <p class="mt-3 max-w-3xl text-sm leading-relaxed text-bone/75">
+            Dos reinos que jamás debieron tocarse se superpusieron bajo un eclipse doble. De un lado, Albion Nocturne: campanas, lluvia eterna y un gremio que cazaba demonios. Del otro, Neo-Kanda 0x: torres de datos, neón y un hacker que reparaba el mundo desde las sombras. Al cruzarse, el cielo se partió en dos colores — y el caos comenzó a cantar. Esta es la historia que el álbum cuenta, canción por canción.
+          </p>
+        </div>
+      </div>
+
+      <!-- Dualidad: las dos columnas de personaje -->
+      <div id="paneles-personajes" class="grid gap-8 lg:grid-cols-2"></div>
+
+      <!-- Arsenal y Emblemas -->
+      <h3 class="mb-8 mt-24 text-center font-display text-2xl font-black tracking-wide text-bone sm:text-3xl" data-reveal>Arsenal <span class="text-dim">&amp;</span> Emblemas</h3>
+      <div id="fichas-arsenal" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4" data-reveal-group></div>
+
+      <!-- Villanos -->
+      <h3 class="mb-2 mt-24 text-center font-display text-2xl font-black tracking-wide text-bone sm:text-3xl" data-reveal>Los Rostros del Caos</h3>
+      <p class="mx-auto mb-10 max-w-xl text-center text-sm text-dim" data-reveal>Tres amenazas, dos reinos. Ninguna de las dos luces puede derrotarlas sola.</p>
+      <div id="villanos" class="grid gap-6 md:grid-cols-3" data-reveal-group></div>
+
+      <!-- Localidades -->
+      <h3 class="mb-10 mt-24 text-center font-display text-2xl font-black tracking-wide text-bone sm:text-3xl" data-reveal>Reinos <span class="text-dim">&amp;</span> Localidades</h3>
+      <div id="localidades" class="grid gap-6 md:grid-cols-2" data-reveal-group></div>
+
+      <!-- Galería de arte conceptual -->
+      <h3 class="mb-2 mt-24 text-center font-display text-2xl font-black tracking-wide text-bone sm:text-3xl" data-reveal>Arte Conceptual</h3>
+      <p class="mx-auto mb-10 max-w-xl text-center text-sm text-dim" data-reveal>Los archivos visuales del universo. Pasa el cursor sobre cada ficha para inspeccionarla.</p>
+    </div>
+    <div id="galeria" class="flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-4 sm:px-6 lg:px-[max(1.5rem,calc((100vw_-_80rem)/2_+_1.5rem))]" data-reveal aria-label="Galería de arte conceptual"></div>
+  </section>
+
+  <!-- ================= BLOQUE 4 · CRIPTOGRAMA INTERACTIVO DE YUMEKI (desde B) ================= -->
+  <section id="letras" class="relative overflow-hidden py-24 sm:py-28" aria-label="Criptograma interactivo de Yumeki">
+    <span aria-hidden="true" class="texto-fantasma pointer-events-none absolute -right-8 top-8 hidden select-none font-code text-[18vw] font-black leading-none lg:block">01</span>
+    <div class="relative z-10 mx-auto max-w-3xl px-4 sm:px-6">
+      <div id="cabecera-cripto"></div>
+
+      <div id="cripto-card" class="relative overflow-hidden rounded-2xl border border-white/10 bg-gothic/70 p-6 sm:p-10" data-reveal>
+        <span aria-hidden="true" class="esquina-gotica left-3 top-3 border-l-2 border-t-2"></span>
+        <span aria-hidden="true" class="esquina-gotica right-3 top-3 border-r-2 border-t-2"></span>
+        <span aria-hidden="true" class="esquina-gotica bottom-3 left-3 border-b-2 border-l-2"></span>
+        <span aria-hidden="true" class="esquina-gotica bottom-3 right-3 border-b-2 border-r-2"></span>
+
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex items-center gap-4">
+            <span class="relative inline-grid place-items-center">
+              <span aria-hidden="true" class="glifo-giratorio absolute -inset-2 rounded-full border border-dashed border-cyan-neon/30"></span>
+              <button type="button" id="cripto-sello" data-cursor aria-label="Sello de cera del Gremio"
+                class="sello-cera grid size-12 place-items-center rounded-full font-display text-xs font-black text-white/90">YL</button>
+            </span>
+            <div>
+              <p class="font-code text-[10px] uppercase tracking-[0.3em] text-dim">Transmisión cifrada</p>
+              <p id="cripto-estado" class="font-code text-[11px] uppercase tracking-[0.25em] text-crimson-soft">● señal bloqueada</p>
+            </div>
+          </div>
+          <span class="hidden font-code text-[10px] uppercase tracking-[0.25em] text-dim sm:block">Canal: <span class="text-cyan-neon">Gremio Lumen</span></span>
+        </div>
+
+        <div class="mt-6 rounded-xl border border-white/10 bg-void/70 p-5">
+          <p id="cripto-mensaje" class="break-words font-code text-[13px] leading-7 tracking-[0.12em] text-crimson-soft/90"></p>
+        </div>
+
+        <div class="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <div class="flex items-center gap-3">
+            <button type="button" id="cripto-menos" data-cursor aria-label="Bajar la clave"
+              class="grid size-10 place-items-center rounded-full border border-white/15 bg-void/60 font-code text-bone transition-colors hover:border-cyan-neon/60 hover:text-cyan-neon">−</button>
+            <input id="cripto-slider" type="range" min="0" max="25" value="13" class="w-44 sm:w-52" aria-label="Clave de descifrado" />
+            <button type="button" id="cripto-mas" data-cursor aria-label="Subir la clave"
+              class="grid size-10 place-items-center rounded-full border border-white/15 bg-void/60 font-code text-bone transition-colors hover:border-cyan-neon/60 hover:text-cyan-neon">+</button>
+          </div>
+          <p class="font-code text-xs text-dim">Clave: <span id="cripto-valor" class="text-cyan-neon">13</span><span class="text-dim/60"> / 25</span></p>
+          <div class="flex gap-3 sm:ml-auto">
+            <button type="button" id="cripto-pista" data-cursor
+              class="rounded-full border border-white/15 bg-void/60 px-5 py-2 font-code text-[11px] font-bold uppercase tracking-[0.2em] text-dim transition-colors hover:border-gold/60 hover:text-gold">Pista</button>
+            <button type="button" id="cripto-descifrar" data-cursor
+              class="rounded-full border border-crimson/70 bg-crimson/10 px-5 py-2 font-code text-[11px] font-bold uppercase tracking-[0.2em] text-crimson-soft transition-all hover:bg-crimson hover:text-white">Descifrar</button>
+          </div>
+        </div>
+        <p id="cripto-feedback" class="mt-4 font-code text-[11px] text-dim">La transmisión llegó con la clave girada. Encuentra la posición correcta y pulsa «Descifrar».</p>
+      </div>
+
+      <!-- Carta revelada (aparece al resolver) -->
+      <div id="cripto-carta" class="mt-8 hidden overflow-hidden rounded-2xl border border-cyan-neon/30 bg-gothic" data-reveal>
+        <div class="border-b border-white/10 bg-cyan-neon/5 px-6 py-4 sm:px-10">
+          <p class="font-code text-[10px] uppercase tracking-[0.35em] text-cyan-neon">Transmisión abierta · Carta del Gremio</p>
+        </div>
+        <div id="cripto-carta-cuerpo" class="space-y-4 px-6 py-8 sm:px-10"></div>
+        <div class="border-t border-white/10 px-6 py-6 sm:px-10">
+          <label for="cripto-firma" class="font-code text-[10px] uppercase tracking-[0.3em] text-dim">Firma el juramento del Gremio</label>
+          <div class="mt-3 flex flex-col gap-3 sm:flex-row">
+            <input id="cripto-firma" type="text" maxlength="24" placeholder="Tu nombre (o tu alias)..."
+              class="w-full rounded-full border border-white/15 bg-void/60 px-5 py-2.5 font-code text-sm text-bone placeholder:text-dim/60 focus:border-cyan-neon/60 focus:outline-none" />
+            <button type="button" id="cripto-firmar" data-cursor
+              class="shrink-0 rounded-full border border-gold/60 bg-gold/10 px-6 py-2.5 font-code text-[11px] font-bold uppercase tracking-[0.2em] text-gold transition-all hover:bg-gold hover:text-void">
+              <i class="fa-solid fa-stamp mr-2" aria-hidden="true"></i>Sellar
+            </button>
+          </div>
+          <p id="cripto-firma-ok" class="mt-3 hidden font-code text-[11px] text-gold"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= BLOQUE 5 · LA TIENDA ================= -->
+  <section id="tienda" class="relative py-24 sm:py-28" aria-label="Tienda oficial">
+    <div aria-hidden="true" class="absolute inset-x-0 top-0 h-full bg-gothic/45"></div>
+    <div class="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
+      <div id="cabecera-tienda"></div>
+      <div id="productos" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4" data-reveal-group></div>
+      <p class="mt-10 text-center font-code text-[11px] uppercase tracking-[0.25em] text-dim" data-reveal>
+        <i class="fa-solid fa-shield-halved mr-2 text-cyan-neon" aria-hidden="true"></i>
+        Pedidos protegidos por el Sello del Gremio Lumen — envíos a todo el reino (y al otro)
+      </p>
+    </div>
+  </section>
+
+  <!-- ================= BLOQUE 6 · PRÓXIMOS PROYECTOS ================= -->
+  <section id="proyectos" class="relative py-24 sm:py-28" aria-label="Próximos proyectos">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <div id="cabecera-proyectos"></div>
+      <div id="novela-card" class="overflow-hidden rounded-2xl border border-white/10 bg-gothic" data-reveal></div>
+      <!-- Teaser Vol. 2 + cortos narrados -->
+      <div class="mt-8 grid gap-5 sm:grid-cols-2" data-reveal-group>
+        <div class="flex items-center gap-5 rounded-2xl border border-white/8 bg-gothic/70 p-6" data-cursor>
+          <span class="grid size-14 shrink-0 place-items-center rounded-xl border border-cyan-neon/30 bg-void/70 text-xl text-cyan-neon"><i class="fa-solid fa-compact-disc" aria-hidden="true"></i></span>
+          <div>
+            <h4 class="font-display text-lg font-black text-bone">Requiem: Binary — Vol. 2</h4>
+            <p class="mt-1 text-[13px] leading-relaxed text-bone/65">El segundo capítulo del duelo entre la oración y el glitch. Título clasificado por el Director.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-5 rounded-2xl border border-white/8 bg-gothic/70 p-6" data-cursor>
+          <span class="grid size-14 shrink-0 place-items-center rounded-xl border border-crimson/30 bg-void/70 text-xl text-crimson-soft"><i class="fa-solid fa-masks-theater" aria-hidden="true"></i></span>
+          <div>
+            <h4 class="font-display text-lg font-black text-bone">Cortos narrados</h4>
+            <p class="mt-1 text-[13px] leading-relaxed text-bone/65">Relatos de batalla contados por las dos voces del proyecto, publicados entre volumen y volumen.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="relative mt-auto border-t border-white/5 bg-gothic/70 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-12">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <div class="flex flex-col items-center gap-8 md:flex-row md:justify-between">
+      <div class="text-center md:text-left">
+        <p class="font-display text-lg font-black tracking-[0.22em] text-bone">NEO<span class="text-crimson">—</span>MELODY</p>
+        <p class="mt-1.5 font-code text-[11px] uppercase tracking-[0.3em] text-dim">Dos reinos. <span class="text-cyan-neon">Una voz.</span></p>
+      </div>
+      <ul id="redes" class="flex items-center gap-3"></ul>
+      <nav aria-label="Pie de página">
+        <ul class="flex flex-wrap justify-center gap-x-6 gap-y-2 font-code text-[10px] uppercase tracking-[0.25em] text-dim">
+          <li><a href="#escucha" data-cursor class="transition-colors hover:text-cyan-neon">Escucha</a></li>
+          <li><a href="#archivo" data-cursor class="transition-colors hover:text-cyan-neon">Archivo</a></li>
+          <li><a href="#letras" data-cursor class="transition-colors hover:text-cyan-neon">Letras</a></li>
+          <li><a href="#tienda" data-cursor class="transition-colors hover:text-cyan-neon">Tienda</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="mt-10 border-t border-white/5 pt-6 text-center">
+      <p class="font-code text-[10px] uppercase tracking-[0.3em] text-dim">© 2026 Neo-Melody · Requiem: Binary — Echoes of Two Realms</p>
+      <p class="mt-2 font-code text-[10px] tracking-[0.2em] text-dim/60">Hecho con <i class="fa-solid fa-heart text-crimson" aria-hidden="true"></i> y un poco de glitch</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ================= CAJÓN DEL CARRITO ================= -->
+<div id="cajon-carrito" class="fixed inset-0 z-50 transition-opacity duration-500 invisible opacity-0" aria-hidden="true">
+  <div id="fondo-cajon" class="absolute inset-0 bg-void/70 backdrop-blur-sm"></div>
+  <aside role="dialog" aria-label="Carrito de compras" id="panel-cajon"
+    class="absolute right-0 top-0 flex h-full w-full max-w-md translate-x-full flex-col border-l border-white/10 bg-gothic shadow-[-20px_0_60px_rgba(0,0,0,0.5)] transition-transform duration-500"
+    style="padding-bottom: env(safe-area-inset-bottom)">
+    <header class="flex items-center justify-between border-b border-white/10 px-6 py-5">
+      <h2 class="font-display text-lg font-black tracking-wide text-bone"><i class="fa-solid fa-bag-shopping mr-3 text-crimson" aria-hidden="true"></i>Tu carrito</h2>
+      <button type="button" id="btn-cerrar-carrito" data-cursor aria-label="Cerrar carrito" class="grid size-10 place-items-center rounded-full border border-white/10 text-dim transition-colors hover:border-crimson/60 hover:text-crimson">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+    </header>
+    <div id="carrito-lista" class="flex-1 overflow-y-auto px-6 py-5"></div>
+    <div id="carrito-pie"></div>
+  </aside>
+</div>
+
+<!-- ================= AVISO (TOAST) ================= -->
+<div id="toast" role="status" aria-live="polite" class="pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 translate-y-4 opacity-0 transition-all duration-500">
+  <div class="flex items-center gap-3 rounded-full border border-white/15 bg-panel/95 px-6 py-3.5 shadow-[0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-md">
+    <i class="fa-solid fa-circle-info text-cyan-neon" aria-hidden="true"></i>
+    <p id="toast-texto" class="max-w-xs text-sm text-bone sm:max-w-md"></p>
+  </div>
+</div>
+<script>
+// ============================================================================
+// NEO-MELODY · REQUIEM: BINARY — DATOS DEL UNIVERSO
+// ----------------------------------------------------------------------------
+// Todo el contenido de la página vive aquí para que puedas editarlo fácilmente.
+// Las líneas marcadas con "REEMPLAZA" son las únicas que debes tocar cuando
+// tengas tus enlaces reales (Spotify, pago, redes).
+// ============================================================================
+
+// --------------------- CONFIGURACIÓN GLOBAL — ¡REEMPLAZA! -------------------
+const CONFIG = {
+  // Enlace del sencillo en Spotify (ej: "https://open.spotify.com/track/...")
+  spotifySencillo: "",
+  // Embebido de Spotify (Compartir > Insertar pista; pega solo la URL del src)
+  spotifyEmbed: "",
+  // Enlace de pago real (Stripe / Shopify / MercadoPago). Vacío = aviso de preventa
+  enlacePago: "",
+  // Redes sociales del footer (vacío = se muestran como "próximamente")
+  social: { spotify: "", youtube: "", instagram: "", x: "" },
+};
+
+// ------------------------------- TRACKLIST ----------------------------------
+// estado: "sencillo" (destacado) | "listo" (letra disponible) | "sellado"
+// spotifyUrl: pega aquí el enlace de Spotify de cada pista cuando exista
+//   (ej: spotifyUrl: "https://open.spotify.com/track/...") y la ficha de esa
+//   pista mostrará sola el botón "Escuchar en Spotify". Sin enlace = sin botón.
+const TRACKS = [
+  {
+    id: "t1", num: "01", titulo: "Panico", jp: "パニック", duracion: "1:47",
+    tags: ["Vals 3/4", "Piano & Violín", "Intro"],
+    notas: [
+      "Dos motivos opuestos: el Réquiem (menor, victoriano) y el Binary (glitch, digital) se presentan separados y terminan tocándose por primera vez.",
+      "Escala Frigia Dominante • Piano preparado • Cinta invertida",
+    ],
+    estado: "sellado",
+  },
+  {
+    id: "t2", num: "02", titulo: "Lluvia en Albion", jp: "影の王様", duracion: "3:56",
+    tags: ["Balada", "Piano & Violín", "Sencillo"],
+    notas: [
+      "La ciudad bajo la lluvia eterna vista por Yumeki: melancolía victoriana moderna, con arreglos de violín en trémolo y un piano que no resuelve nunca.",
+      "Escala Frigia Dominante • Vals 3/4 → 4/4 • Violines en trémolo",
+    ],
+    estado: "sencillo",
+    letra: {
+      jp: [
+        "小さな女の子、地獄に落ちた",
+"悪魔の王に育てられて",
+"無垢なハートは黒く染まった",
+"涙はもう、戻らない",
+"",
+"ステップ、踏み込んで、次元を越えろ",
+"辺境のセカイ、私の玉座",
+"黒い鎧が肌を包む",
+"ここで息をして",
+"おかえり、私の地獄へ",
+"誰もこの場所からは逃げられない",
+"半分は悪魔",
+"半分は少女",
+"",
+"マジでキレたら誰も止めらんない",
+"眠った夜ごと、牙に変えた",
+"魂の剣で切り裂いて",
+"名前さえ、呪いに変える",
+"",
+"ステップ、踏み込んで、次元を越えろ",
+"辺境のセカイ、私の玉座",
+"黒い鎧が肌を包む",
+"もう戻れない",
+"",
+"おかえり、私の地獄へ",
+"誰もこの場所からは逃げられない",
+"半分は悪魔",
+"半分は少女",
+"",
+"運命なんて、自分で決める",
+"泣き顔のままじゃ終われない",
+"焼けた心で、空を裂いて",
+"私は私を選ぶ",
+"",
+"おかえり、私の地獄へ",
+"誰もこの場所からは逃げられない",
+"半分は悪魔",
+"半分は少女",
+"",
+"地獄へ",
+"ようこそ",
+"地獄へ",
+"私の王国",
+      ],
+      romaji: [
+        "Ame ga furu, ishidatami no machi",
+        "Tsuki wa shizumi, kane wa nariyamanai",
+        "Yume no naka de kimi to chikatta",
+        "Kibou no yaiba wo dakishimete",
+        "",
+        "Chinkonka wo utatte, futatsu no kokoro de",
+        "Zero to ichi no sukima demo",
+        "Hikari wa kienai",
+      ],
+      es: [
+        "La lluvia cae sobre la ciudad empedrada",
+        "La luna se hunde y la campana no calla",
+        "En el sueño lo juré contigo:",
+        "abrazo la espada de la esperanza",
+        "",
+        "Canta un réquiem, con dos corazones",
+        "incluso en la grieta entre el 0 y el 1",
+        "la luz no se apaga",
+      ],
+    },
+  },
+  {
+    id: "t3", num: "03", titulo: "¡Despierta, Gremio!", jp: "ギルド、目覚めろ！", duracion: "3:24",
+    tags: ["J-Rock", "Math Rock", "Batalla"],
+    notas: [
+      "Narración de una batalla divertida: Yumeki se burla de los demonios mientras pelea. Riffs con compases cambiantes y golpe de slap en el puente.",
+      "Compás 7/8 ↔ 4/4 • Riff math rock • Slap de bajo",
+    ],
+    estado: "listo",
+    letra: {
+      jp: [
+        "起きろ起きろ、旧時代の悪魔！",
+        "私の剣はもう歌ってる",
+        "退屈だね、まだ牙を見せるの？",
+        "最後の一人でも、ギルドは終わらない！",
+      ],
+      romaji: [
+        "Okiro okiro, kyuujidai no akuma!",
+        "Watashi no ken wa mou utatteru",
+        "Taikutsu da ne, mada kiba wo miseru no?",
+        "Saigo no hitori demo, girudo wa owaranai!",
+      ],
+      es: [
+        "¡Despierta, despierta, demonio de la vieja era!",
+        "Mi espada ya está cantando",
+        "¿Qué aburrido, aún enseñas los colmillos?",
+        "¡Aunque sea la última, el gremio no termina!",
+      ],
+    },
+  },
+  {
+    id: "t4", num: "04", titulo: "Slash//Life", jp: "斬新ライフ", duracion: "3:08",
+    tags: ["Glitch-Hop", "Slap", "Neo"],
+    notas: [
+      "El corte de Kageki: bajos slap atraviesan beats de glitch-hop; los vocal chops suenan a datos corrompidos que se reparan al ritmo.",
+      "Bajo slap • Vocal chops glitch • 100 BPM",
+    ],
+    estado: "sellado",
+  },
+  {
+    id: "t5", num: "05", titulo: "La Última del Gremio", jp: "最後の騎士", duracion: "4:12",
+    tags: ["Balada épica", "Violines", "Lore"],
+    notas: [
+      "La Purga de Ceniza contada en primera persona. Cuerda en trémolo como lluvia de ceniza y un coro que solo entra una vez, al final.",
+      "Trémolo de cuerdas • Coro victoriano • Tonalidad: La frigio",
+    ],
+    estado: "sellado",
+  },
+  {
+    id: "t6", num: "06", titulo: "Vals del Apocalipsis", jp: "終末のワルツ", duracion: "3:47",
+    tags: ["Vals 3/4", "J-Rock", "Zombis"],
+    notas: [
+      "Un uno-dos-tres elegante para bailar sobre una ciudad caída: metales oxidados, giro metálico y una guitarra que imita sirenas.",
+      "Vals 3/4 • Distorsión vintage • Sirenas sampleadas",
+    ],
+    estado: "sellado",
+  },
+  {
+    id: "t7", num: "07", titulo: "Kokoro Bug", jp: "ココロ・バグ", duracion: "3:15",
+    tags: ["Glitch-Hop", "Dúo", "Yumeki × Kageki"],
+    notas: [
+      "Primer dúo: la voz kawaii de Yumeki contra el rap de Kageki discuten por el mismo corazón y terminan cantando juntos en el estribillo.",
+      "Dúo vocal • Bucle de error como coro • 90 BPM",
+    ],
+    estado: "listo",
+    letra: {
+      jp: [
+        "エラーだらけのこの世界で（歌おう）",
+        "バグだらけのこの心で（生きよう）",
+        "それでも生きる、それでも歌う",
+        "0と1の隙間で、君の声を聞いた",
+        "",
+        "直せないコードなら、愛せばいい",
+      ],
+      romaji: [
+        "Eraa darake no kono sekai de (utaou)",
+        "Bagu darake no kono kokoro de (ikiyou)",
+        "Soredemo ikiru, soredemo utau",
+        "Zero to ichi no sukima de, kimi no koe wo kiita",
+        "",
+        "Naosenai koodo nara, aiseba ii",
+      ],
+      es: [
+        "En este mundo lleno de errores (cantemos)",
+        "Con este corazón lleno de bugs (vivamos)",
+        "Aun así vivo, aun así canto",
+        "En la grieta entre el 0 y el 1 escuché tu voz",
+        "",
+        "Si el código no se puede reparar, entonces ámalo",
+      ],
+    },
+  },
+  {
+    id: "t8", num: "08", titulo: "Espada de Alma", jp: "魂の剣", duracion: "4:01",
+    tags: ["Math Rock", "Batalla", "Tapping"],
+    notas: [
+      "La ficha sonora del arma de Yumeki: tapping limpio como campanadas y un cambio a 5/4 cuando la hoja canta.",
+      "Tapping • 5/4 • Campana y arco",
+    ],
+    estado: "sellado",
+  },
+  {
+    id: "t9", num: "09", titulo: "Terminal 0x00", jp: "端末ゼロ", duracion: "2:58",
+    tags: ["Rap", "Glitch", "Kageki solo"],
+    notas: [
+      "Monólogo de Kageki desde las sombras: rap seco sobre estática y 808 con picos de datos; al final, media segunda de silencio... y la voz de Yumeki.",
+      "808 + estática • Flow 16ths • Silencio como golpe",
+    ],
+    estado: "sellado",
+  },
+  {
+    id: "t10", num: "10", titulo: "Finale: Dos Reinos, Una Voz", jp: "終章 : 二つの国、一つの声", duracion: "5:20",
+    tags: ["Piano & Violín", "Coro", "Cierre"],
+    notas: [
+      "Los dos motivos de la Overture regresan y por fin resuelven juntos: el piano victoriano sostiene el glitch, el violín responde al 808.",
+      "Reprise doble • Coro final • Resolución en Do mayor",
+    ],
+    estado: "sellado",
+  },
+];
+
+// ------------------------------- PERSONAJES ---------------------------------
+const PERSONAJES = [
+  {
+    id: "yumeki",
+    nombre: "Yumeki", kanji: "夢希", significado: "夢 Sueño · 希 Esperanza",
+    epigrafe: "The End of a Prayer",
+    rol: "Voz principal · Heroína del Gremio Lumen",
+    imagen: "images/yumeki.png",
+    ficha: [
+      { etiqueta: "Reino", valor: "Albion Nocturne — era victoriana" },
+      { etiqueta: "Arma", valor: "«Réquiem», espada de alma de hoja cyan" },
+      { etiqueta: "Emblema", valor: "Sello del Gremio Lumen (el último)" },
+      { etiqueta: "Voz", valor: "Kawaii — el contraste del j-rock agresivo" },
+      { etiqueta: "Rasgo", valor: "La última de su gremio; pelea sonriendo" },
+    ],
+    historia: [
+      "La última cazadora del Gremio Lumen, la orden que juró proteger Albion Nocturne de demonios y vampiros. Cuando la Purga de Ceniza silenció a sus compañeros, la responsabilidad completa recayó sobre ella — y decidió cargarla bailando.",
+      "Su espada de alma, «Réquiem», no corta carne: corta maldiciones. Por eso Yumeki se toma las batallas de manera relajada y divertida: para ella, cada victoria es un funeral más que officia con cortesía. Su voz dulce es el contraste perfecto sobre la agresividad del j-rock.",
+      "En las canciones, ella es el lado tierno del álbum — y también su melancolía: la lluvia, la luna, las campanas que no callan.",
+    ],
+    frases: ["«La espada canta por los que ya no pueden.»", "«¿Listos? Que empiece el funeral.»"],
+  },
+  {
+    id: "kageki",
+    nombre: "Kageki", kanji: "過激", significado: "過激 Radical · 影 Sombra",
+    epigrafe: "The Beginning of a Riot",
+    rol: "Segunda voz · Rap · Glitches",
+    imagen: "images/kageki.png",
+    ficha: [
+      { etiqueta: "Reino", valor: "Neo-Kanda 0x — era futurista" },
+      { etiqueta: "Arma", valor: "Guantes víricos «Cero» (cuerpo a cuerpo)" },
+      { etiqueta: "Emblema", valor: "Sigilo Binario — 0x4B414745" },
+      { etiqueta: "Voz", valor: "Rap agresivo — los cortes de glitch" },
+      { etiqueta: "Rasgo", valor: "Hackea cualquier dispositivo digital" },
+    ],
+    historia: [
+      "El hacker que repara los glitches desde las sombras. En Neo-Kanda 0x, Kageki es una leyenda: puede meterse en cualquier dispositivo digital y doblarlo a su voluntad. Su segunda voz y su rap son los cortes de glitch que rasgan las canciones del álbum.",
+      "Cuando ambos reinos se cruzaron, cruzó también. En el reino victoriano de Yumeki no hay internet, no hay red, no hay nada que hackear — así que peleó cuerpo a cuerpo con armas futuristas, siempre un paso adelante gracias a la información que aporta para resolver el conflicto de ambos mundos.",
+      "Representa el lado rudo y rebelde del álbum: estática, neón, carmesí.",
+    ],
+    frases: ["«Todo sistema tiene una puerta. Yo soy el cerrojo.»", "«Sin red no hay miedo. Solo puños.»"],
+  },
+];
+
+// --------------------------- ARMAS Y EMBLEMAS -------------------------------
+const FICHAS = [
+  {
+    icono: "fa-solid fa-wand-sparkles", acento: "cyan",
+    nombre: "«Réquiem» — Espada de Alma", portador: "Yumeki", tipo: "Arma · Cazamaldiciones",
+    desc: "Su hoja cyan no corta cuerpos: corta vínculos malditos. Al golpear, la espada canta un réquiem distinto por cada entidad que libera. Dicen que memoriza el nombre de todo lo que purifica.",
+  },
+  {
+    icono: "fa-solid fa-hand-fist", acento: "crimson",
+    nombre: "Guantes víricos «Cero»", portador: "Kageki", tipo: "Arma · Cuerpo a cuerpo",
+    desc: "Par de guantes futuristas que almacenan cada línea de código que Kageki ha hackeado. En Albion —donde no hay red que hackear— son su única arma: cada golpe inyecta datos que ninguna era victoriana sabe leer.",
+  },
+  {
+    icono: "fa-solid fa-shield-heart", acento: "cyan",
+    nombre: "Sello del Gremio Lumen", portador: "Yumeki", tipo: "Emblema · Reliquia",
+    desc: "El último de los sellos del gremio. Brilla con luz propia cuando una entidad maligna está cerca y arde en cyan cuando su portadora jura algo. Juramentos sellados con él jamás se han roto.",
+  },
+  {
+    icono: "fa-solid fa-microchip", acento: "crimson",
+    nombre: "Sigilo Binario", portador: "Kageki", tipo: "Emblema · Marca de territorio",
+    desc: "Un glifo rotatorio que Kageki imprime sobre cada sistema que domina. Donde el sigilo aparece, la estática se ordena: la zona queda «hackeada» y obedece a su voluntad hasta que el glifo se apaga.",
+  },
+];
+
+// -------------------------------- VILLANOS ----------------------------------
+const VILLANOS = [
+  {
+    imagen: "images/vesper.png", nombre: "Alaric Vesper", titulo: "El Conde de Ceniza",
+    reino: "Albion Nocturne", amenaza: "Nivel: Purga",
+    desc: "El vampiro aristócrata que dirigió la Purga de Ceniza y silenció al Gremio Lumen en una sola noche. Elegante, paciente y absolutamente convencido de que la oración es un arte muerto: convirtió cada capilla de Albion en una vela más de su salón.",
+  },
+  {
+    imagen: "images/null.png", nombre: "NULL//Ø", titulo: "El Rey Estático",
+    reino: "Neo-Kanda 0x", amenaza: "Nivel: Corrupción total",
+    desc: "Una entidad que devora memoria digital y devuelve estática. Nadie sabe si es un programa que enloqueció o un dios que aprendió a tener hambre. Cada glitch que Kageki repara es una grieta por donde NULL//Ø ya pasó.",
+  },
+  {
+    imagen: "images/director.png", nombre: "El Director", titulo: "El Maestro de la Grieta",
+    reino: "Ambos — y ninguno", amenaza: "Nivel: [ DATO CIFRADO ]",
+    desc: "El que condujo el cruce de los dos reinos. Nadie ha visto su rostro; solo su batuta de luz y las partituras que flotan a su alrededor, mitad en carmesí, mitad en cyan. Su partitura final se titula, según los archivos: «La Sinfonía Vacía».",
+  },
+];
+
+// ------------------------------- LOCALIDADES --------------------------------
+const LOCALIDADES = [
+  {
+    imagen: "images/albion.png", nombre: "Albion Nocturne", lema: "La ciudad donde la lluvia reza",
+    desc: "Capital de la era victoriana: campanarios infinitos, gas encendido y una lluvia que nunca termina. Bajo sus calles, las catacumbas guardan lo que el Gremio Lumen selló... y lo que no pudo.",
+  },
+  {
+    imagen: "images/neokanda.png", nombre: "Neo-Kanda 0x", lema: "El distrito que nunca duerme ni borra",
+    desc: "Distrito cyberpunk de torres de datos y neón perpetuo. Aquí la información vale más que la sangre y los errores se pagan caro. Es el hogar de Kageki y el terreno de caza de NULL//Ø.",
+  },
+  {
+    imagen: "images/grieta.png", nombre: "La Grieta", lema: "Donde las dos eras se tocan", ancho: true,
+    desc: "La herida abierta entre ambos mundos: una catedral victoriana inclinada contra torres de datos, partida por un rayo doble de cyan y carmesí. Desde la Noche del Doble Eclipse, crece un milímetro por cada canción que se escucha.",
+  },
+];
+
+// ------------------------- GALERÍA DE ARTE CONCEPTUAL -----------------------
+const GALERIA = [
+  { imagen: "images/yumeki.png", titulo: "Yumeki — Diseño de personaje", categoria: "Personaje" },
+  { imagen: "images/kageki.png", titulo: "Kageki — Diseño de personaje", categoria: "Personaje" },
+  { imagen: "images/vesper.png", titulo: "Alaric Vesper — El Conde de Ceniza", categoria: "Villano" },
+  { imagen: "images/null.png", titulo: "NULL//Ø — El Rey Estático", categoria: "Villano" },
+  { imagen: "images/director.png", titulo: "El Director — Maestro de la Grieta", categoria: "Villano" },
+  { imagen: "images/albion.png", titulo: "Albion Nocturne", categoria: "Localidad" },
+  { imagen: "images/neokanda.png", titulo: "Neo-Kanda 0x", categoria: "Localidad" },
+  { imagen: "images/grieta.png", titulo: "La Grieta — Key Visual", categoria: "Key Visual" },
+];
+
+// ---------------------- TIENDA — Precios en MXN ------------------------------
+const PRODUCTOS = [
+  { id: "digital", icono: "fa-solid fa-compact-disc", nombre: "Álbum Digital — Requiem: Binary Vol.1", desc: "10 pistas + libro digital con el lore del universo y letras comentadas.", precio: 149, etiqueta: "Digital", imagen: "images/cover.jpg" },
+  { id: "cd", icono: "fa-solid fa-box-open", nombre: "CD Edición Gótica", desc: "Digipack negro con lámina doble cara y una tarjeta-colección de emblema aleatoria.", precio: 349 },
+  { id: "vinilo", icono: "fa-solid fa-record-vinyl", nombre: "Vinilo Duality 180g", desc: "Disco partido: mitad carmesí, mitad cyan. Incluye poster de La Grieta.", precio: 699, etiqueta: "Edición limitada", imagen: "images/grieta.png" },
+  { id: "artbook", icono: "fa-solid fa-book-skull", nombre: "Artbook «El Archivo Binary»", desc: "96 páginas de arte conceptual: personajes, villanos, localidades y notas de diseño.", precio: 429, imagen: "images/yumeki.png" },
+  { id: "poster", icono: "fa-solid fa-image", nombre: "Póster «La Grieta» A2", desc: "Key visual del cruce de reinos, impreso en papel mate de 250g.", precio: 199, imagen: "images/albion.png" },
+  { id: "pin", icono: "fa-solid fa-certificate", nombre: "Pin «Sello del Gremio Lumen»", desc: "Esmalte metálico con brillo cyan en la oscuridad. El último sello, ahora el tuyo.", precio: 249 },
+  { id: "llavero", icono: "fa-solid fa-key", nombre: "Llavero «Réquiem»", desc: "La espada de alma en acrílico translúcido con glow cyan. Con cadena de mosquetón.", precio: 189 },
+  { id: "novela", icono: "fa-solid fa-gamepad", nombre: "Preventa — Novela Visual «Códice de las Dos Luces»", desc: "Acceso anticipado a la novela visual + OST digital exclusiva al lanzarse.", precio: 299, etiqueta: "Preventa" },
+];
+
+// ---------------------- NOVELA VISUAL — Próximos proyectos ------------------
+const NOVELA = {
+  titulo: "Códice de las Dos Luces",
+  subtitulo: "Novela Visual · Requiem: Binary",
+  progreso: 12,
+  estado: "En escritura",
+  motor: "En decisión",
+  lanzamiento: "TBA — cuando la partitura esté lista",
+  features: [
+    { icono: "fa-solid fa-code-branch", texto: "Decisiones que alteran el canon del álbum" },
+    { icono: "fa-solid fa-people-arrows", texto: "Rutas jugables de Yumeki y Kageki" },
+    { icono: "fa-solid fa-music", texto: "Banda sonora reactiva: la música cambia con tus votos" },
+    { icono: "fa-solid fa-mask", texto: "Ruta secreta: «La Sinfonía Vacía» del Director" },
+  ],
+};
+</script>
+<script>
+// ============================================================================
+// LÓGICA DEL SITIO — versión vanilla del portal (sin frameworks)
+// Estado global + renderizadores + interacciones, con persistencia en
+// localStorage (carrito, visibilidad de letras y registro de la novela).
+// ============================================================================
+
+// --------------------------- Utilidades -------------------------------------
+const $ = (sel) => document.querySelector(sel);
+const formatearMXN = (n) =>
+  new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 }).format(n);
+
+// --------------------------- Estado global ----------------------------------
+const estado = {
+  carrito: {},            // { idProducto: cantidad }
+  letrasVisibles: true,   // interruptor global de letras
+  carritoAbierto: false,
+  abiertas: new Set(),    // pistas expandidas en la Sala de Escucha
+  activa: "t2",           // pestaña activa del Criptograma
+  avisoTimer: null,
+};
+
+// Cargar lo persistido (carrito, letras, registro de la novela)
+try {
+  const c = localStorage.getItem("nm_cart");
+  if (c) estado.carrito = JSON.parse(c);
+  const l = localStorage.getItem("nm_letras_visibles");
+  if (l !== null) estado.letrasVisibles = l === "true";
+} catch (e) { /* almacenamiento no disponible: seguimos sin persistencia */ }
+
+// Tras el arranque, los re-renderizados revelan su contenido al instante
+// (el IntersectionObserver ya no observa los nodos nuevos)
+let sitioIniciado = false;
+function revelarInmediatamente(raiz) {
+  (raiz || document).querySelectorAll("[data-reveal]").forEach((el) => {
+    el.classList.add("revelado");
+    el.style.transition = "none";
+  });
+}
+
+// --------------------------- Avisos (toast) ---------------------------------
+function aviso(texto) {
+  const caja = $("#toast");
+  $("#toast-texto").textContent = texto;
+  caja.classList.remove("translate-y-4", "opacity-0");
+  clearTimeout(estado.avisoTimer);
+  estado.avisoTimer = setTimeout(() => {
+    caja.classList.add("translate-y-4", "opacity-0");
+  }, 3400);
+}
+
+// ------------------- Cabecera reutilizable de sección -----------------------
+function htmlCabecera(idDestino, bloque, titulo, descripcion) {
+  document.getElementById(idDestino).innerHTML = `
+    <div class="mx-auto mb-14 max-w-3xl text-center" data-reveal>
+      <p class="mb-3 font-code text-[11px] uppercase tracking-[0.4em] text-dim"><span class="text-crimson">${bloque}</span></p>
+      <h2 class="shimmer-text font-display text-4xl font-black tracking-wide sm:text-5xl">${titulo}</h2>
+      <p class="mt-5 text-sm leading-relaxed text-dim">${descripcion}</p>
+    </div>`;
+}
+
+// --------------------------- Cinta de palabras ------------------------------
+function renderCinta() {
+  const PALABRAS = ["DUALIDAD", "J-ROCK", "MATH ROCK", "GLITCH-HOP", "RÉQUIEM", "BINARIO", "VALS 3/4", "PIANO & VIOLÍN", "SLAP", "FRIGIA DOMINANTE"];
+  const cinta = [...PALABRAS, ...PALABRAS]; // duplicado para el bucle infinito
+  $("#cinta").innerHTML = cinta
+    .map((p, i) => `
+      <span class="flex items-center gap-12 font-code text-xs uppercase tracking-[0.35em] text-dim">
+        ${p}<i class="fa-solid fa-compact-disc text-[10px] ${i % 2 === 0 ? "text-crimson" : "text-cyan-neon"}"></i>
+      </span>`)
+    .join("");
+}
+
+// ============================================================================
+// BLOQUE 2 · SALA DE ESCUCHA
+// ============================================================================
+
+// Bloque de letra con tres columnas alineadas (JP / Romaji / Español)
+function htmlLetraBloque(track) {
+  if (!track.letra) return "";
+  const lineas = (arr, vacia) => arr.map((l) => (l === "" ? vacia : `<p>${l}</p>`)).join("");
+  return `
+    <div class="glitch-zone grid gap-6 rounded-xl border border-white/5 bg-void/60 p-6 sm:grid-cols-3" data-cursor>
+      <div>
+        <p class="mb-3 font-code text-[10px] uppercase tracking-[0.3em] text-cyan-neon">原文 · Japonés</p>
+        <div class="glitch-text space-y-2.5 font-display text-base leading-relaxed text-bone">${lineas(track.letra.jp, "<p>&nbsp;</p>")}</div>
+      </div>
+      <div>
+        <p class="mb-3 font-code text-[10px] uppercase tracking-[0.3em] text-dim">Romaji</p>
+        <div class="space-y-2.5 font-code text-xs leading-relaxed text-dim">${lineas(track.letra.romaji, "<p>&nbsp;</p>")}</div>
+      </div>
+      <div>
+        <p class="mb-3 font-code text-[10px] uppercase tracking-[0.3em] text-crimson-soft">Español</p>
+        <div class="space-y-2.5 text-sm italic leading-relaxed text-bone/80">${lineas(track.letra.es, "<p>&nbsp;</p>")}</div>
+      </div>
+    </div>`;
+}
+
+// Sello de cera para pistas cuya letra sigue clasificada u oculta
+function htmlLetraSellada() {
+  return `
+    <div class="flex items-center gap-5 rounded-xl border border-white/5 bg-void/60 p-6">
+      <span class="sello-cera grid size-16 shrink-0 place-items-center rounded-full text-white"><i class="fa-solid fa-lock text-lg" aria-hidden="true"></i></span>
+      <div>
+        <p class="font-display text-sm font-bold uppercase tracking-[0.2em] text-bone">Letra clasificada</p>
+        <p class="mt-1 text-sm text-dim">Sellada con el sello del Gremio Lumen hasta el lanzamiento del volumen. El Director no permite filtraciones.</p>
+      </div>
+    </div>`;
+}
+
+// Detalle expandible (notas + Spotify + letra según el interruptor global)
+function htmlDetallePista(t) {
+  const notas = t.notas.map((n) => `
+    <li class="flex gap-3 text-sm leading-relaxed text-bone/85">
+      <i class="fa-solid ${t.estado === "sencillo" ? "fa-compact-disc mt-1 text-[10px] text-cyan-neon" : "fa-sliders mt-1 text-[10px] text-crimson-soft"}" aria-hidden="true"></i>${n}
+    </li>`).join("");
+  const letra = t.letra ? (estado.letrasVisibles ? htmlLetraBloque(t) : htmlLetraSellada()) : htmlLetraSellada();
+  // Botón "Escuchar en Spotify": aparece solo si la pista tiene spotifyUrl en DATOS DEL UNIVERSO
+  const spotify = t.spotifyUrl ? `
+    <a href="${t.spotifyUrl}" target="_blank" rel="noopener noreferrer" data-cursor
+      class="inline-flex items-center gap-2.5 rounded-full border border-cyan-neon/50 bg-cyan-neon/10 px-5 py-2.5 font-code text-[11px] font-bold uppercase tracking-[0.2em] text-cyan-neon transition-all duration-300 hover:bg-cyan-neon hover:text-void hover:shadow-[0_0_20px_rgba(0,229,255,0.45)]">
+      <i class="fa-brands fa-spotify text-base" aria-hidden="true"></i> Escuchar en Spotify
+    </a>` : "";
+  return `<div class="space-y-5"><ul class="space-y-2.5">${notas}</ul>${spotify}${letra}</div>`;
+}
+
+// Sencillo destacado (tarjeta superior de la Sala de Escucha)
+function renderSencillo() {
+  const s = TRACKS.find((t) => t.estado === "sencillo");
+  if (!s) return;
+  const abierta = estado.abiertas.has(s.id);
+  const barras = [10, 18, 8, 22, 14, 24, 9, 16, 20, 7, 15, 12].map((h, i) => `
+    <span class="w-1.5 rounded-full bg-gradient-to-t from-crimson/70 to-cyan-neon/70"
+      style="height:${h * 4}%; animation: parpadeo ${0.9 + (i % 5) * 0.18}s ease-in-out ${i * 0.07}s infinite alternate; opacity: 0.55;"></span>`).join("");
+  $("#sencillo-card").innerHTML = `
+    <div data-reveal data-tilt data-cursor class="overflow-hidden rounded-2xl border border-crimson/25 bg-gradient-to-br from-gothic to-panel shadow-[0_0_50px_rgba(255,0,85,0.12)]">
+      <div class="grid items-center gap-6 p-6 sm:grid-cols-[auto_1fr] sm:p-8">
+        <div class="relative mx-auto size-40 overflow-hidden rounded-xl border border-white/10 sm:mx-0 sm:size-44">
+          <img src="images/cover.jpg" alt="Portada del sencillo ${s.titulo}" class="absolute inset-0 h-full w-full object-cover" />
+        </div>
+        <div class="text-center sm:text-left">
+          <p class="mb-2 inline-flex items-center gap-2 rounded-full border border-crimson/50 bg-crimson/10 px-3 py-1 font-code text-[10px] uppercase tracking-[0.3em] text-crimson-soft">
+            <i class="fa-solid fa-star" aria-hidden="true"></i> Sencillo destacado
+          </p>
+          <h3 class="font-display text-2xl font-bold text-bone sm:text-3xl">${s.titulo}</h3>
+          <p class="mt-1 font-code text-xs text-dim">${s.jp} — ${s.duracion}</p>
+          <div class="mt-4 flex flex-wrap justify-center gap-3 sm:justify-start">
+            <button type="button" id="btn-reproducir" data-cursor
+              class="inline-flex items-center gap-2.5 rounded-full bg-crimson px-6 py-3 font-code text-[11px] font-bold uppercase tracking-[0.2em] text-white transition-all duration-300 hover:shadow-[0_0_24px_rgba(255,0,85,0.55)]">
+              <i class="fa-solid fa-play" aria-hidden="true"></i> Reproducir
+            </button>
+            <button type="button" id="btn-notas-sencillo" data-cursor aria-expanded="${abierta}"
+              class="inline-flex items-center gap-2.5 rounded-full border border-cyan-neon/50 px-6 py-3 font-code text-[11px] font-bold uppercase tracking-[0.2em] text-cyan-neon transition-all duration-300 hover:bg-cyan-neon/10">
+              <i class="fa-solid fa-scroll" aria-hidden="true"></i> Notas y letra
+            </button>
+          </div>
+          <div class="mt-5 flex h-6 items-end justify-center gap-1 sm:justify-start" aria-hidden="true">${barras}</div>
+        </div>
+      </div>
+      <div id="detalle-sencillo" ${abierta ? "" : "hidden"} class="border-t border-white/5 p-6 sm:p-8"></div>
+    </div>`;
+  // Rellena el detalle solo si está abierto
+  if (abierta) $("#detalle-sencillo").innerHTML = htmlDetallePista(s);
+
+  $("#btn-reproducir").addEventListener("click", () => {
+    // Prioridad: enlace global del sencillo (CONFIG) o el propio de la pista
+    const url = CONFIG.spotifySencillo || s.spotifyUrl;
+    if (url) {
+      window.open(url, "_blank", "noopener");
+    } else {
+      aviso("El audio se conecta en cuanto el máster esté listo. Mientras tanto, lee la letra.");
+      alternarPista(s.id);
+    }
+  });
+  $("#btn-notas-sencillo").addEventListener("click", () => alternarPista(s.id));
+
+  // En re-renderizados: revelar al instante y recuperar el tilt 3D
+  if (sitioIniciado) {
+    revelarInmediatamente($("#sencillo-card"));
+    iniciarTilt($("#sencillo-card"));
+  }
+}
+
+// Control global de visibilidad de letras (Mostrar / Ocultar)
+function renderControlLetras() {
+  const v = estado.letrasVisibles;
+  $("#control-letras").innerHTML = `
+    <div class="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-white/5 bg-gothic/60 px-5 py-4" data-reveal>
+      <p class="flex items-center gap-3 font-code text-[11px] uppercase tracking-[0.25em] text-dim">
+        <i class="fa-solid fa-eye text-cyan-neon" aria-hidden="true"></i> Visibilidad de letras
+      </p>
+      <div class="flex items-center gap-3">
+        <button type="button" data-accion="mostrar" data-cursor
+          class="rounded-full px-4 py-2 font-code text-[10px] uppercase tracking-[0.2em] transition-all ${v ? "bg-cyan-neon font-bold text-void" : "border border-white/15 text-dim hover:text-bone"}">
+          <i class="fa-solid fa-eye mr-1.5" aria-hidden="true"></i> Mostrar
+        </button>
+        <button type="button" data-accion="ocultar" data-cursor
+          class="rounded-full px-4 py-2 font-code text-[10px] uppercase tracking-[0.2em] transition-all ${!v ? "bg-crimson font-bold text-white" : "border border-white/15 text-dim hover:text-bone"}">
+          <i class="fa-solid fa-eye-slash mr-1.5" aria-hidden="true"></i> Ocultar
+        </button>
+      </div>
+    </div>`;
+  $("#control-letras [data-accion='mostrar']").addEventListener("click", () => alternarLetras(true));
+  $("#control-letras [data-accion='ocultar']").addEventListener("click", () => alternarLetras(false));
+  if (sitioIniciado) revelarInmediatamente($("#control-letras"));
+}
+
+// Tracklist completo: cada fila expande su ficha de notas y letra
+function renderTracklist() {
+  $("#tracklist").innerHTML = TRACKS.map((t) => {
+    const abierta = estado.abiertas.has(t.id);
+    return `
+    <li class="overflow-hidden rounded-xl border border-white/5 bg-gothic/70 transition-colors duration-300 hover:border-white/15">
+      <button type="button" data-pista="${t.id}" data-cursor aria-expanded="${abierta}"
+        class="group flex w-full items-center gap-4 px-5 py-4 text-left sm:gap-6 sm:px-6">
+        <span class="font-display text-xl font-bold transition-colors group-hover:text-bone ${t.estado === "sencillo" ? "text-crimson" : "text-dim"}">${t.num}</span>
+        <span class="min-w-0 flex-1">
+          <span class="block truncate font-display text-base font-bold text-bone sm:text-lg">
+            ${t.titulo}${t.estado === "sencillo" ? `<span class="ml-2.5 inline-block rounded-full bg-crimson/15 px-2 py-0.5 align-middle font-code text-[9px] uppercase tracking-[0.2em] text-crimson-soft">Sencillo</span>` : ""}
+          </span>
+          <span class="mt-0.5 block truncate font-code text-[11px] text-dim">${t.jp} · ${t.tags.join(" · ")}</span>
+        </span>
+        <span class="hidden font-code text-xs text-dim sm:block">${t.duracion}</span>
+        <i class="fa-solid fa-chevron-down text-xs text-dim transition-transform duration-300 ${abierta ? "rotate-180 text-cyan-neon" : ""}" aria-hidden="true"></i>
+      </button>
+      <div id="detalle-${t.id}" ${abierta ? "" : "hidden"} class="border-t border-white/5 px-5 py-6 sm:px-6"></div>
+    </li>`;
+  }).join("");
+
+  // Detalles abiertos + oyentes de expansión
+  TRACKS.forEach((t) => {
+    if (estado.abiertas.has(t.id)) {
+      const det = document.getElementById(`detalle-${t.id}`);
+      if (det) det.innerHTML = htmlDetallePista(t);
+    }
+    const btn = document.querySelector(`[data-pista="${t.id}"]`);
+    if (btn) btn.addEventListener("click", () => alternarPista(t.id));
+  });
+}
+
+// Alterna la expansión de una pista (sencillo incluido) y refresca el scroll
+function alternarPista(id) {
+  if (estado.abiertas.has(id)) estado.abiertas.delete(id);
+  else estado.abiertas.add(id);
+
+  const det = document.getElementById(`detalle-${id}`);
+  const btn = document.querySelector(`[data-pista="${id}"]`) || document.getElementById("btn-notas-sencillo");
+  if (det) {
+    if (estado.abiertas.has(id)) det.innerHTML = htmlDetallePista(TRACKS.find((t) => t.id === id) || {});
+    det.hidden = !estado.abiertas.has(id);
+  }
+  // El sencillo no usa data-pista: refrescamos su tarjeta completa
+  if (id === (TRACKS.find((t) => t.estado === "sencillo") || {}).id) renderSencillo();
+  if (btn) btn.setAttribute("aria-expanded", estado.abiertas.has(id));
+  setTimeout(() => window.ScrollTrigger && ScrollTrigger.refresh(), 320);
+}
+
+// Alterna el interruptor global de letras y persiste la preferencia
+function alternarLetras(forzar) {
+  const nuevo = typeof forzar === "boolean" ? forzar : !estado.letrasVisibles;
+  if (nuevo === estado.letrasVisibles) return;
+  estado.letrasVisibles = nuevo;
+  try { localStorage.setItem("nm_letras_visibles", String(nuevo)); } catch (e) {}
+  renderControlLetras();
+  renderTracklist();
+  renderSencillo(); // rellena de nuevo el detalle si está abierto
+  setTimeout(() => window.ScrollTrigger && ScrollTrigger.refresh(), 320);
+}
+
+// ============================================================================
+// BLOQUE 4 · CRIPTOGRAMA INTERACTIVO DE YUMEKI (traído de B)
+// ============================================================================
+
+// Estallido de partículas local del criptograma (usa el anime.js ya cargado en A)
+function estallidoCripto(x, y, n = 22) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches || !window.anime) return;
+  const colores = ["#00e5ff", "#ff0055", "#d9a441", "#e2e2e9"];
+  for (let i = 0; i < n; i++) {
+    const p = document.createElement("span");
+    p.className = "particula";
+    p.style.left = x + "px"; p.style.top = y + "px";
+    p.style.background = colores[i % 4];
+    $("#particulas").appendChild(p);
+    anime({ targets: p,
+      translateX: () => anime.random(-130, 130), translateY: () => anime.random(-130, 130),
+      rotate: () => anime.random(0, 360),
+      opacity: [{ value: 1, duration: 160 }, { value: 0, duration: 650 }],
+      easing: "easeOutCubic", duration: 820, complete: () => p.remove() });
+  }
+}
+
+function iniciarCriptograma() {
+  const REDUCIDO = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const CLAVE = 7;
+  const PLANO = "EL SELLO DEL GREMIO AUN BRILLA. MIENTRAS UNA VOZ CANTE ESTE REQUIEM, NINGUN REINO CAERA. LA ESPADA CANTA POR LOS QUE YA NO PUEDEN. Y AHORA, TAMBIEN POR TI. — YUMEKI";
+  const PISTAS = [
+    "Es una promesa de Yumeki: habla del Sello del Gremio y de una espada que canta.",
+    "Las letras se movieron 7 posiciones. Prueba la clave 07.",
+  ];
+  const CARTA = `
+    <p class="font-code text-[10px] uppercase tracking-[0.3em] text-dim">Para quien encuentre esta transmisión</p>
+    <p class="text-sm leading-relaxed text-bone/85">El Sello del Gremio Lumen aún brilla. Mientras una voz cante este réquiem, ningún reino caerá.</p>
+    <p class="text-sm leading-relaxed text-bone/85">La espada canta por los que ya no pueden. Y ahora... también por ti.</p>
+    <p class="font-display text-lg font-black text-cyan-neon">— Yumeki <span class="ml-1 font-code text-xs font-normal tracking-[0.2em] text-dim">夢希 · La última del Gremio</span></p>
+    <div class="flex flex-wrap gap-2 pt-1">
+      <span class="rounded-full border border-cyan-neon/30 bg-cyan-neon/10 px-4 py-1.5 text-[12px] italic text-cyan-neon">«La espada canta por los que ya no pueden.»</span>
+      <span class="rounded-full border border-crimson/30 bg-crimson/10 px-4 py-1.5 text-[12px] italic text-crimson-soft">«¿Listos? Que empiece el funeral.»</span>
+    </div>`;
+
+  const desplazar = (t, k) => t.replace(/[A-Z]/g, c => String.fromCharCode(((c.charCodeAt(0) - 65 + k) % 26 + 26) % 26 + 65));
+  const CIFRADO = desplazar(PLANO, CLAVE);
+
+  const slider = $("#cripto-slider"), btnMenos = $("#cripto-menos"), btnMas = $("#cripto-mas"),
+        valor = $("#cripto-valor"), msg = $("#cripto-mensaje"), btnDesc = $("#cripto-descifrar"),
+        btnPista = $("#cripto-pista"), feedback = $("#cripto-feedback"), estado = $("#cripto-estado"),
+        sello = $("#cripto-sello"), carta = $("#cripto-carta"), cartaCuerpo = $("#cripto-carta-cuerpo"),
+        inputFirma = $("#cripto-firma"), btnFirmar = $("#cripto-firmar"), firmaOk = $("#cripto-firma-ok");
+
+  let clave = 1 + Math.floor(Math.random() * 25);
+  if (clave === CLAVE) clave = (clave + 5) % 26;
+  let intentos = 0, pistaIdx = 0, resuelto = false, firmado = false;
+
+  function pinta() {
+    valor.textContent = String(clave).padStart(2, "0");
+    slider.value = clave;
+    msg.textContent = desplazar(CIFRADO, -clave);
+    const listo = clave === CLAVE;
+    msg.classList.toggle("msg-listo", listo);
+    btnDesc.classList.toggle("cripto-listo", listo);
+    estado.textContent = resuelto ? "● transmisión abierta" : listo ? "● señal detectada" : "● señal bloqueada";
+    estado.classList.toggle("estado-lista", listo || resuelto);
+  }
+  function pista() {
+    if (resuelto || pistaIdx >= PISTAS.length) return;
+    feedback.textContent = "PISTA — " + PISTAS[pistaIdx]; pistaIdx++;
+    if (pistaIdx >= PISTAS.length) { btnPista.disabled = true; btnPista.classList.add("opacity-40", "pointer-events-none"); }
+  }
+  function exito() {
+    resuelto = true; pinta();
+    msg.textContent = PLANO;
+    feedback.textContent = `Cifrado roto${intentos ? ` en ${intentos} intento(s)` : " al primer giro"}. La carta ya es legible.`;
+    btnDesc.textContent = "Transmisión abierta";
+    [slider, btnMenos, btnMas, btnDesc, btnPista].forEach(el => { el.disabled = true; el.classList.add("opacity-40", "pointer-events-none"); });
+    sello.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i>';
+    carta.classList.remove("hidden");
+    cartaCuerpo.innerHTML = CARTA;
+    const r = carta.getBoundingClientRect();
+    estallidoCripto(r.left + r.width / 2, Math.max(80, r.top + 40));
+    aviso("Mensaje descifrado — Yumeki sonríe en algún punto de Albion.");
+    carta.scrollIntoView({ behavior: REDUCIDO ? "auto" : "smooth", block: "nearest" });
+  }
+
+  slider.addEventListener("input", () => { if (!resuelto) { clave = +slider.value; pinta(); } });
+  btnMenos.addEventListener("click", () => { if (!resuelto) { clave = (clave + 25) % 26; pinta(); } });
+  btnMas.addEventListener("click", () => { if (!resuelto) { clave = (clave + 1) % 26; pinta(); } });
+  btnPista.addEventListener("click", pista);
+  btnDesc.addEventListener("click", () => {
+    if (resuelto) return;
+    if (clave === CLAVE) { exito(); return; }
+    intentos++;
+    feedback.textContent = `Estática... la clave ${String(clave).padStart(2, "0")} no abre nada (intento ${intentos}).`;
+    const card = $("#cripto-card");
+    card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake");
+    if (intentos === 2 && pistaIdx === 0) pista();
+  });
+  sello.addEventListener("click", e => {
+    if (resuelto) { estallidoCripto(e.clientX, e.clientY, 14); return; }
+    aviso("El sello está tibio: la carta fue escrita hace poco.");
+  });
+  function firmar() {
+    if (firmado || !resuelto) return;
+    const n = (inputFirma.value || "").trim() || "Anónimo del otro reino";
+    firmado = true;
+    firmaOk.textContent = `Juramento sellado por “${n}” — Sello del Gremio Lumen. Nunca se ha roto.`;
+    firmaOk.classList.remove("hidden");
+    inputFirma.disabled = true;
+    btnFirmar.disabled = true; btnFirmar.classList.add("opacity-50", "pointer-events-none");
+    aviso("Juramento sellado. El Sello te reconoce, del otro lado de la Grieta.");
+    estallidoCripto(innerWidth / 2, innerHeight - 120);
+  }
+  btnFirmar.addEventListener("click", firmar);
+  inputFirma.addEventListener("keydown", e => { if (e.key === "Enter") firmar(); });
+
+  pinta();
+}
+</script>
+<script>
+// ============================================================================
+// BLOQUE 3 · EL ARCHIVO BINARY + BLOQUE 5 · TIENDA + BLOQUE 6 · PROYECTOS
+// ============================================================================
+
+// Panel de personaje — cada lado con su propia estética (cyan × carmesí)
+function htmlPanelPersonaje(p) {
+  const esYumeki = p.id === "yumeki";
+  const acentoTexto = esYumeki ? "text-cyan-neon" : "text-crimson-soft";
+  const acentoBorde = esYumeki ? "hover:border-cyan-neon/40" : "hover:border-crimson/40";
+  const acentoSombra = esYumeki
+    ? "hover:shadow-[0_0_45px_rgba(0,229,255,0.14)]"
+    : "hover:shadow-[0_0_45px_rgba(255,0,85,0.14)]";
+
+  const ornamentos = esYumeki ? `
+      <span class="esquina-gotica left-3 top-3 border-l border-t" aria-hidden="true"></span>
+      <span class="esquina-gotica right-3 top-3 border-r border-t" aria-hidden="true"></span>
+      <span class="esquina-gotica bottom-3 left-3 border-b border-l" aria-hidden="true"></span>
+      <span class="esquina-gotica bottom-3 right-3 border-b border-r" aria-hidden="true"></span>` : "";
+
+  const terminalSup = esYumeki ? "" : `
+      <div class="terminal flex items-center gap-2 border-b border-white/5 px-4 py-2.5">
+        <span class="size-2.5 rounded-full bg-crimson/70" aria-hidden="true"></span>
+        <span class="size-2.5 rounded-full bg-gold/70" aria-hidden="true"></span>
+        <span class="size-2.5 rounded-full bg-cyan-neon/70" aria-hidden="true"></span>
+        <span class="linea-codigo ml-2 cursor-parpadeo">kageki@neokanda:~$ identidad --verificar</span>
+      </div>`;
+
+  const terminalInf = esYumeki ? "" : `
+      <div class="terminal mt-6 rounded-lg px-4 py-3">
+        <p class="linea-codigo">$ acceso_otorgado --reino=albion --modo=cuerpo_a_cuerpo</p>
+        <p class="linea-codigo">&gt; red: NO ENCONTRADA · honor: INTACTO</p>
+        <p class="linea-codigo cursor-parpadeo">&gt; _</p>
+      </div>`;
+
+  return `
+    <article data-reveal data-tilt data-cursor
+      class="group relative overflow-hidden rounded-2xl border border-white/10 bg-gothic transition-all duration-500 ${acentoBorde} ${acentoSombra} ${esYumeki ? "bg-[radial-gradient(ellipse_at_20%_0%,rgba(0,229,255,0.06),transparent_55%)]" : ""}">
+      ${ornamentos}
+      ${terminalSup}
+      <div class="relative aspect-[4/3] overflow-hidden">
+        <img src="${p.imagen}" alt="Arte de personaje de ${p.nombre}" class="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105" />
+        <div class="absolute inset-0 bg-gradient-to-t from-gothic via-transparent to-transparent" aria-hidden="true"></div>
+        <span aria-hidden="true" class="absolute right-4 top-3 font-display text-6xl font-black opacity-25 transition-opacity duration-500 group-hover:opacity-60 ${acentoTexto}">${p.kanji}</span>
+      </div>
+      <div class="relative p-6 sm:p-8">
+        <p class="font-code text-[10px] uppercase tracking-[0.35em] ${acentoTexto}">${p.epigrafe}</p>
+        <h3 class="mt-2 font-display text-3xl font-black text-bone">${p.nombre} <span class="text-lg text-dim">${p.kanji}</span></h3>
+        <p class="mt-1 font-code text-[11px] text-dim">${p.significado}</p>
+        <p class="mt-3 font-code text-xs uppercase tracking-[0.15em] ${acentoTexto}">${p.rol}</p>
+        <dl class="mt-6 space-y-2.5 rounded-xl border border-white/5 bg-void/50 p-5">
+          ${p.ficha.map((f) => `
+            <div class="grid grid-cols-[92px_1fr] gap-3 text-sm">
+              <dt class="font-code text-[10px] uppercase tracking-[0.2em] text-dim">${f.etiqueta}</dt>
+              <dd class="leading-snug text-bone/90">${f.valor}</dd>
+            </div>`).join("")}
+        </dl>
+        <div class="mt-6 space-y-4 text-sm leading-relaxed text-bone/80">
+          ${p.historia.map((h) => `<p>${h}</p>`).join("")}
+        </div>
+        <div class="mt-6 space-y-2">
+          ${p.frases.map((frase) => `<p class="font-display text-sm italic opacity-90 ${acentoTexto}">${frase}</p>`).join("")}
+        </div>
+        ${terminalInf}
+      </div>
+    </article>`;
+}
+
+function renderArchivo() {
+  $("#paneles-personajes").innerHTML = PERSONAJES.map(htmlPanelPersonaje).join("");
+
+  // Arsenal y Emblemas — fichas con acento por color
+  $("#fichas-arsenal").innerHTML = FICHAS.map((f) => {
+    const colorAcento = f.acento === "cyan" ? "text-cyan-neon" : f.acento === "crimson" ? "text-crimson-soft" : "text-gold";
+    const anillo =
+      f.acento === "cyan" ? "hover:border-cyan-neon/50 hover:shadow-[0_0_30px_rgba(0,229,255,0.12)]"
+      : f.acento === "crimson" ? "hover:border-crimson/50 hover:shadow-[0_0_30px_rgba(255,0,85,0.12)]"
+      : "hover:border-gold/50 hover:shadow-[0_0_30px_rgba(217,164,65,0.12)]";
+    return `
+      <article data-tilt data-cursor class="rounded-2xl border border-white/10 bg-gothic p-6 transition-all duration-500 ${anillo}">
+        <span class="mb-4 grid size-12 place-items-center rounded-xl border border-white/10 bg-void/70 text-lg ${colorAcento}"><i class="${f.icono}" aria-hidden="true"></i></span>
+        <p class="font-code text-[9px] uppercase tracking-[0.3em] text-dim">${f.tipo}</p>
+        <h4 class="mt-1.5 font-display text-base font-bold leading-snug text-bone">${f.nombre}</h4>
+        <p class="mt-1 font-code text-[10px] uppercase tracking-[0.2em] ${colorAcento}">${f.portador}</p>
+        <p class="mt-3 text-[13px] leading-relaxed text-bone/70">${f.desc}</p>
+      </article>`;
+  }).join("");
+
+  // Villanos
+  $("#villanos").innerHTML = VILLANOS.map((v) => `
+    <article data-tilt data-cursor class="glitch-zone group overflow-hidden rounded-2xl border border-white/10 bg-gothic transition-all duration-500 hover:border-crimson/40 hover:shadow-[0_0_40px_rgba(255,0,85,0.13)]">
+      <div class="relative aspect-[4/5] overflow-hidden">
+        <img src="${v.imagen}" alt="Villano: ${v.nombre} — ${v.titulo}" class="absolute inset-0 h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-105" />
+        <div class="absolute inset-0 bg-gradient-to-t from-gothic via-gothic/20 to-transparent" aria-hidden="true"></div>
+        <span class="absolute left-4 top-4 rounded-full border border-crimson/50 bg-void/75 px-3 py-1 font-code text-[9px] uppercase tracking-[0.25em] text-crimson-soft backdrop-blur-sm">${v.amenaza}</span>
+      </div>
+      <div class="p-6 pt-2">
+        <p class="font-code text-[10px] uppercase tracking-[0.3em] text-dim">${v.reino}</p>
+        <h4 class="glitch-text mt-1 font-display text-xl font-black text-bone">${v.nombre}</h4>
+        <p class="font-code text-[11px] text-crimson-soft">${v.titulo}</p>
+        <p class="mt-3 text-[13px] leading-relaxed text-bone/70">${v.desc}</p>
+      </div>
+    </article>`).join("");
+
+  // Localidades (La Grieta ocupa el ancho completo) — clic para ampliar
+  $("#localidades").innerHTML = LOCALIDADES.map((l, i) => `
+    <article data-tilt data-cursor role="button" tabindex="0" aria-label="Ampliar imagen de ${l.nombre}"
+      class="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/10 transition-all duration-500 hover:border-cyan-neon/30 hover:shadow-[0_0_40px_rgba(0,229,255,0.1)] ${l.ancho ? "md:col-span-2" : ""}">
+      <div class="relative ${l.ancho ? "aspect-[21/9]" : "aspect-[16/9]"}">
+        <img src="${l.imagen}" alt="Localidad: ${l.nombre} — ${l.lema}" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+        <div class="absolute inset-0 bg-gradient-to-t from-void via-void/25 to-transparent" aria-hidden="true"></div>
+        <span class="absolute right-4 top-4 grid size-9 place-items-center rounded-full border border-white/20 bg-void/60 text-bone opacity-0 backdrop-blur-sm transition-all duration-500 group-hover:opacity-100">
+          <i class="fa-solid fa-magnifying-glass-plus text-xs" aria-hidden="true"></i>
+        </span>
+      </div>
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 p-6">
+        <p class="font-code text-[10px] uppercase tracking-[0.35em] text-cyan-neon">${l.lema}</p>
+        <h4 class="mt-1 font-display text-2xl font-black text-bone">${l.nombre}</h4>
+        <p class="mt-2 max-w-2xl text-[13px] leading-relaxed text-bone/75">${l.desc}</p>
+      </div>
+    </article>`).join("");
+
+  // Galería de arte conceptual (carrusel horizontal con snap) — clic para ampliar
+  $("#galeria").innerHTML = GALERIA.map((g, i) => `
+    <figure data-tilt data-cursor role="button" tabindex="0" aria-label="Ampliar: ${g.titulo}"
+      class="group relative aspect-[3/4] w-64 shrink-0 cursor-pointer snap-center overflow-hidden rounded-2xl border border-white/10 bg-gothic transition-all duration-500 hover:border-gold/40 hover:shadow-[0_0_35px_rgba(217,164,65,0.12)] sm:w-72">
+      <img src="${g.imagen}" alt="${g.titulo}" class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
+      <div class="absolute inset-0 bg-gradient-to-t from-void/95 via-transparent to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-100" aria-hidden="true"></div>
+      <figcaption class="absolute inset-x-0 bottom-0 p-5">
+        <p class="font-code text-[9px] uppercase tracking-[0.3em] text-gold">${g.categoria}</p>
+        <p class="mt-1 font-display text-sm font-bold leading-snug text-bone">${g.titulo}</p>
+      </figcaption>
+      <span class="absolute right-4 top-4 grid size-9 place-items-center rounded-full border border-gold/50 bg-void/60 text-gold opacity-0 backdrop-blur-sm transition-all duration-500 group-hover:opacity-100">
+        <i class="fa-solid fa-magnifying-glass-plus text-xs" aria-hidden="true"></i>
+      </span>
+    </figure>`).join("");
+
+  // Conecta los clics al lightbox compartido (flechas + zoom)
+  document.querySelectorAll("#localidades [role=button]").forEach((el, i) => {
+    el.addEventListener("click", () => abrirLightbox(
+      LOCALIDADES.map((l) => ({ imagen: l.imagen, titulo: l.nombre, subtitulo: l.lema })), i));
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); el.click(); } });
+  });
+  document.querySelectorAll("#galeria [role=button]").forEach((el, i) => {
+    el.addEventListener("click", () => abrirLightbox(
+      GALERIA.map((g) => ({ imagen: g.imagen, titulo: g.titulo, subtitulo: g.categoria })), i));
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); el.click(); } });
+  });
+}
+
+// ------------------------------ TIENDA --------------------------------------
+function renderTienda() {
+  $("#productos").innerHTML = PRODUCTOS.map((p) => `
+    <article data-tilt data-cursor class="group flex flex-col rounded-2xl border border-white/10 bg-gothic p-6 transition-all duration-500 hover:border-gold/40 hover:shadow-[0_0_35px_rgba(217,164,65,0.1)]">
+      ${p.etiqueta ? `<span class="mb-4 self-start rounded-full border border-gold/50 bg-gold/10 px-3 py-1 font-code text-[9px] uppercase tracking-[0.25em] text-gold">${p.etiqueta}</span>` : ""}
+      ${p.imagen
+        ? `<button type="button" data-ampliar="${p.id}" data-cursor aria-label="Ampliar imagen de ${p.nombre}" class="relative mx-auto mb-5 block w-full overflow-hidden rounded-xl">
+             <span class="glifo-giratorio pointer-events-none absolute inset-0 rounded-xl border border-dashed border-white/15 group-hover:border-gold/40" aria-hidden="true"></span>
+             <img src="${p.imagen}" alt="${p.nombre}" loading="lazy" class="aspect-[4/3] w-full rounded-xl object-cover transition-transform duration-500 group-hover:scale-105" />
+             <span class="absolute bottom-2 right-2 grid size-8 place-items-center rounded-full border border-white/20 bg-void/80 text-[11px] text-bone opacity-0 backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-100"><i class="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i></span>
+           </button>`
+        : `<span class="relative mx-auto mb-5 grid size-20 place-items-center">
+             <span class="glifo-giratorio absolute inset-0 rounded-full border border-dashed border-white/15 group-hover:border-gold/40" aria-hidden="true"></span>
+             <i class="${p.icono} text-3xl text-bone transition-colors duration-500 group-hover:text-gold" aria-hidden="true"></i>
+           </span>`}
+      <h3 class="font-display text-base font-bold leading-snug text-bone">${p.nombre}</h3>
+      <p class="mt-2 flex-1 text-[13px] leading-relaxed text-bone/65">${p.desc}</p>
+      <div class="mt-5 flex items-center justify-between gap-3">
+        <p class="font-display text-xl font-black text-crimson-soft">${formatearMXN(p.precio)}</p>
+        <button type="button" data-anadir="${p.id}" data-cursor
+          class="inline-flex items-center gap-2 rounded-full border border-cyan-neon/50 px-4 py-2 font-code text-[10px] font-bold uppercase tracking-[0.18em] text-cyan-neon transition-all duration-300 hover:bg-cyan-neon hover:text-void hover:shadow-[0_0_20px_rgba(0,229,255,0.4)]">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i> Añadir
+        </button>
+      </div>
+    </article>`).join("");
+
+  document.querySelectorAll("[data-anadir]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const p = PRODUCTOS.find((x) => x.id === btn.dataset.anadir);
+      if (!p) return;
+      estado.carrito[p.id] = (estado.carrito[p.id] || 0) + 1;
+      guardarCarrito();
+      aviso(`Añadido al carrito: ${p.nombre}`);
+    });
+  });
+
+  // Lightbox compartido: navega entre todos los productos con imagen
+  const conImagen = PRODUCTOS.filter((x) => x.imagen);
+  const itemsTienda = conImagen.map((x) => ({
+    imagen: x.imagen,
+    titulo: x.nombre,
+    subtitulo: `${formatearMXN(x.precio)}${x.etiqueta ? " · " + x.etiqueta : ""}`,
+  }));
+  document.querySelectorAll("[data-ampliar]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const idx = conImagen.findIndex((x) => x.id === btn.dataset.ampliar);
+      if (idx >= 0) abrirLightbox(itemsTienda, idx);
+    });
+  });
+}
+
+// -------------------- LIGHTBOX (vista ampliada compartida) -------------------
+// Uso: abrirLightbox(lista, indice) — lista = [{imagen, titulo, subtitulo}]
+// Flechas ← → (botones y teclado) para navegar · zoom que sigue al cursor ·
+// contador · ESC o clic fuera para cerrar · bloquea el scroll de fondo.
+let lightboxEstado = null; // { lista, indice } actual
+
+function abrirLightbox(lista, indice) {
+  cerrarLightbox(true); // por si había una abierta
+  lightboxEstado = { lista, indice };
+  const p = lista[indice];
+
+  const caja = document.createElement("div");
+  caja.id = "lightbox-producto";
+  caja.setAttribute("role", "dialog");
+  caja.setAttribute("aria-modal", "true");
+  caja.setAttribute("aria-label", `Vista ampliada: ${p.titulo}`);
+  caja.className = "fixed inset-0 z-[70] flex items-center justify-center bg-void/95 p-4 backdrop-blur-md sm:p-8";
+  const varios = lista.length > 1;
+  caja.innerHTML = `
+    ${varios ? `<button type="button" id="lb-prev" data-cursor aria-label="Imagen anterior"
+      class="fixed left-3 top-1/2 z-10 grid size-12 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-void/70 text-bone backdrop-blur-sm transition-all duration-300 hover:border-cyan-neon hover:text-cyan-neon hover:shadow-[0_0_22px_rgba(0,229,255,0.4)] sm:left-6">
+      <i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>` : ""}
+    <figure class="relative max-h-full w-full max-w-4xl overflow-hidden rounded-2xl border border-white/15 bg-gothic shadow-[0_0_60px_rgba(0,229,255,0.15)]">
+      <figcaption class="flex items-center justify-between gap-4 border-b border-white/10 px-5 py-4">
+        <div class="min-w-0">
+          <h3 class="truncate font-display text-lg font-black text-bone">${p.titulo}</h3>
+          ${p.subtitulo ? `<p class="truncate font-code text-[11px] uppercase tracking-[0.25em] text-gold">${p.subtitulo}</p>` : ""}
+        </div>
+        <div class="flex shrink-0 items-center gap-3">
+          ${varios ? `<span class="rounded-full border border-white/15 px-3 py-1 font-code text-[10px] tracking-[0.2em] text-dim">${indice + 1} / ${lista.length}</span>` : ""}
+          <button type="button" id="btn-cerrar-lightbox" data-cursor aria-label="Cerrar vista ampliada"
+            class="grid size-10 place-items-center rounded-full border border-white/15 text-bone transition-all hover:border-crimson hover:text-crimson">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          </button>
+        </div>
+      </figcaption>
+      <div id="lb-zona" class="relative max-h-[calc(100vh-15rem)] overflow-hidden" data-cursor>
+        <img id="lb-img" src="${p.imagen}" alt="${p.titulo}" draggable="false"
+          class="mx-auto max-h-[calc(100vh-15rem)] w-full select-none object-contain transition-transform duration-300 ease-out" />
+        <span aria-hidden="true" class="pointer-events-none absolute left-3 top-3 size-6 border-l-2 border-t-2 border-cyan-neon/60"></span>
+        <span aria-hidden="true" class="pointer-events-none absolute right-3 top-3 size-6 border-r-2 border-t-2 border-cyan-neon/60"></span>
+        <span aria-hidden="true" class="pointer-events-none absolute bottom-3 left-3 size-6 border-b-2 border-l-2 border-crimson/60"></span>
+        <span aria-hidden="true" class="pointer-events-none absolute bottom-3 right-3 size-6 border-b-2 border-r-2 border-crimson/60"></span>
+      </div>
+      <p class="border-t border-white/10 px-5 py-3 text-center font-code text-[10px] uppercase tracking-[0.25em] text-dim">
+        <i class="fa-solid fa-magnifying-glass-plus mr-2 text-cyan-neon" aria-hidden="true"></i>Pasa el cursor para ver detalles
+        ${varios ? ` · <i class="fa-solid fa-arrow-left mr-1 text-crimson-soft" aria-hidden="true"></i><i class="fa-solid fa-arrow-right mr-1.5 text-crimson-soft" aria-hidden="true"></i>para navegar` : ""}
+        · ESC para cerrar
+      </p>
+    </figure>
+    ${varios ? `<button type="button" id="lb-next" data-cursor aria-label="Imagen siguiente"
+      class="fixed right-3 top-1/2 z-10 grid size-12 -translate-y-1/2 place-items-center rounded-full border border-white/15 bg-void/70 text-bone backdrop-blur-sm transition-all duration-300 hover:border-cyan-neon hover:text-cyan-neon hover:shadow-[0_0_22px_rgba(0,229,255,0.4)] sm:right-6">
+      <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>` : ""}`;
+
+  // Cierre
+  const alTecla = (e) => {
+    if (e.key === "Escape") cerrarLightbox();
+    if (varios && e.key === "ArrowLeft") moverLightbox(-1);
+    if (varios && e.key === "ArrowRight") moverLightbox(1);
+  };
+  document.addEventListener("keydown", alTecla);
+  caja.addEventListener("click", cerrarLightbox);              // clic en el fondo
+  caja.querySelector("figure").addEventListener("click", (e) => e.stopPropagation());
+  caja.querySelector("#btn-cerrar-lightbox").addEventListener("click", cerrarLightbox);
+  if (varios) {
+    caja.querySelector("#lb-prev").addEventListener("click", (e) => { e.stopPropagation(); moverLightbox(-1); });
+    caja.querySelector("#lb-next").addEventListener("click", (e) => { e.stopPropagation(); moverLightbox(1); });
+  }
+  caja.dataset.tecla = "on";
+  lightboxEstado.alTecla = alTecla;
+  document.body.style.overflow = "hidden";                     // bloquea el scroll de fondo
+  document.body.appendChild(caja);
+
+  // Zoom con el cursor: la imagen se amplía y sigue al puntero
+  const zona = caja.querySelector("#lb-zona");
+  const img = caja.querySelector("#lb-img");
+  zona.addEventListener("mouseenter", () => img.style.transform = "scale(1.9)");
+  zona.addEventListener("mouseleave", () => {
+    img.style.transform = "scale(1)";
+    img.style.transformOrigin = "50% 50%";
+  });
+  zona.addEventListener("mousemove", (e) => {
+    const r = zona.getBoundingClientRect();
+    img.style.transformOrigin = `${((e.clientX - r.left) / r.width) * 100}% ${((e.clientY - r.top) / r.height) * 100}%`;
+  });
+}
+
+function moverLightbox(delta) {
+  if (!lightboxEstado) return;
+  const { lista, indice } = lightboxEstado;
+  lightboxEstado.indice = (indice + delta + lista.length) % lista.length;
+  const p = lista[lightboxEstado.indice];
+  const caja = document.querySelector("#lightbox-producto");
+  // Actualiza contenido sin reconstruir
+  caja.querySelector("h3").textContent = p.titulo;
+  const sub = caja.querySelector("figcaption p");
+  if (sub) sub.textContent = p.subtitulo || "";
+  caja.querySelector("#lb-img").src = p.imagen;
+  caja.querySelector("#lb-img").alt = p.titulo;
+  const contador = caja.querySelector("figcaption span");
+  if (contador) contador.textContent = `${lightboxEstado.indice + 1} / ${lista.length}`;
+  // Reinicia el zoom al cambiar de imagen
+  const img = caja.querySelector("#lb-img");
+  img.style.transform = "scale(1)";
+  img.style.transformOrigin = "50% 50%";
+}
+
+function cerrarLightbox(inmediato = false) {
+  const caja = document.querySelector("#lightbox-producto");
+  if (!caja) return;
+  if (lightboxEstado?.alTecla) document.removeEventListener("keydown", lightboxEstado.alTecla);
+  lightboxEstado = null;
+  document.body.style.overflow = "";
+  if (inmediato) { caja.remove(); return; }
+  caja.style.opacity = "0";
+  setTimeout(() => caja.remove(), 250);
+}
+
+// --------------------------- PROYECTOS (novela) ------------------------------
+let registrado = false;
+try { registrado = !!localStorage.getItem("nm_notify"); } catch (e) {}
+
+function renderNovela() {
+  $("#novela-card").innerHTML = `
+    <div>
+      <div class="relative aspect-[16/9] sm:aspect-[21/7]">
+        <img src="images/grieta.png" data-parallax="7" alt="Key visual de la novela visual Códice de las Dos Luces" class="absolute inset-0 h-full w-full scale-110 object-cover" />
+        <div class="absolute inset-0 bg-gradient-to-t from-gothic via-gothic/40 to-transparent" aria-hidden="true"></div>
+        <div class="absolute inset-x-0 bottom-0 p-6 sm:p-8">
+          <p class="font-code text-[10px] uppercase tracking-[0.4em] text-crimson-soft">${NOVELA.subtitulo}</p>
+          <h3 class="mt-1.5 font-display text-3xl font-black text-bone sm:text-4xl">${NOVELA.titulo}</h3>
+        </div>
+      </div>
+      <div class="grid gap-10 p-6 sm:p-8 lg:grid-cols-[1.2fr_0.8fr]">
+        <div>
+          <ul class="space-y-4" data-reveal-group>
+            ${NOVELA.features.map((f) => `
+              <li class="flex items-start gap-4">
+                <span class="mt-0.5 grid size-9 shrink-0 place-items-center rounded-lg border border-white/10 bg-void/70 text-sm text-cyan-neon"><i class="${f.icono}" aria-hidden="true"></i></span>
+                <p class="text-sm leading-relaxed text-bone/85">${f.texto}</p>
+              </li>`).join("")}
+          </ul>
+          <div class="mt-8">
+            <div class="mb-2 flex items-center justify-between font-code text-[11px] uppercase tracking-[0.25em]">
+              <span class="text-dim">Progreso de escritura</span>
+              <span class="text-crimson-soft">${NOVELA.progreso}%</span>
+            </div>
+            <div class="h-3 overflow-hidden rounded-full border border-white/10 bg-void">
+              <div class="barra-textura h-full rounded-full bg-gradient-to-r from-cyan-neon via-bone to-crimson" style="width:${NOVELA.progreso}%"
+                role="progressbar" aria-valuenow="${NOVELA.progreso}" aria-valuemin="0" aria-valuemax="100"
+                aria-label="Progreso de la novela visual: ${NOVELA.progreso}%"></div>
+            </div>
+            <div class="mt-3 flex flex-wrap gap-x-6 gap-y-1 font-code text-[10px] uppercase tracking-[0.25em] text-dim">
+              <span>Estado: <span class="text-bone">${NOVELA.estado}</span></span>
+              <span>Motor: <span class="text-bone">${NOVELA.motor}</span></span>
+              <span>Lanzamiento: <span class="text-bone">${NOVELA.lanzamiento}</span></span>
+            </div>
+          </div>
+        </div>
+        <div id="zona-registro" class="terminal flex flex-col justify-center rounded-2xl border border-white/10 p-6 sm:p-8"></div>
+      </div>
+    </div>`;
+  renderRegistro();
+}
+
+function renderRegistro() {
+  const zona = $("#zona-registro");
+  if (!zona) return;
+  if (!registrado) {
+    zona.innerHTML = `
+      <p class="linea-codigo">sistema@codice:~$ lista_de_espera --unir</p>
+      <form id="form-registro" class="mt-5 space-y-3">
+        <label for="correo-notificacion" class="font-code text-[10px] uppercase tracking-[0.3em] text-dim">Deja tu frecuencia de contacto</label>
+        <input id="correo-notificacion" type="email" required placeholder="tu@correo.com"
+          class="w-full rounded-xl border border-white/15 bg-void/80 px-4 py-3 font-code text-sm text-bone placeholder:text-dim/60 focus:border-crimson focus:outline-none focus:ring-1 focus:ring-crimson" />
+        <button type="submit" data-cursor
+          class="w-full rounded-xl bg-crimson px-4 py-3 font-code text-[11px] font-bold uppercase tracking-[0.25em] text-white transition-all duration-300 hover:shadow-[0_0_26px_rgba(255,0,85,0.5)]">
+          <i class="fa-solid fa-satellite-dish mr-2" aria-hidden="true"></i>Unirme a la lista
+        </button>
+        <p class="linea-codigo opacity-70">&gt; solo un aviso cuando nazca. sin spam. palabra de hacker.</p>
+      </form>`;
+    $("#form-registro").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const correo = $("#correo-notificacion").value.trim();
+      if (!correo || !correo.includes("@")) {
+        aviso("Necesito un correo válido para enviar la señal.");
+        return;
+      }
+      try { localStorage.setItem("nm_notify", JSON.stringify({ correo, fecha: Date.now() })); } catch (err) {}
+      registrado = true;
+      renderRegistro();
+      aviso("Transmisión recibida. Te avisaremos cuando el Códice despierte.");
+    });
+  } else {
+    zona.innerHTML = `
+      <p class="linea-codigo">sistema@codice:~$ estado --frecuencia</p>
+      <div class="mt-5">
+        <p class="font-display text-lg font-bold text-cyan-neon"><i class="fa-solid fa-check mr-2" aria-hidden="true"></i>Señal confirmada</p>
+        <p class="mt-2 text-sm leading-relaxed text-bone/75">Tu frecuencia ya está registrada en este navegador. Serás de los primeros en entrar al Códice cuando la Grieta se abra.</p>
+        <button type="button" id="btn-cancelar-registro" data-cursor
+          class="mt-4 font-code text-[10px] uppercase tracking-[0.25em] text-dim underline-offset-4 transition-colors hover:text-crimson-soft hover:underline">
+          Cancelar mi registro
+        </button>
+      </div>`;
+    $("#btn-cancelar-registro").addEventListener("click", () => {
+      try { localStorage.removeItem("nm_notify"); } catch (err) {}
+      registrado = false;
+      renderRegistro();
+      aviso("Frecuencia liberada. Puedes registrarte de nuevo.");
+    });
+  }
+}
+
+// --------------------------- CARRITO (cajón) --------------------------------
+function itemsCarrito() { return Object.values(estado.carrito).reduce((a, b) => a + b, 0); }
+function totalCarrito() {
+  return Object.entries(estado.carrito).reduce((sum, [id, q]) => {
+    const p = PRODUCTOS.find((x) => x.id === id);
+    return sum + (p ? p.precio * q : 0);
+  }, 0);
+}
+function guardarCarrito() {
+  try { localStorage.setItem("nm_cart", JSON.stringify(estado.carrito)); } catch (e) {}
+  renderCarrito();
+}
+
+function renderCarrito() {
+  const n = itemsCarrito();
+  // Insignia en la barra de navegación
+  const badge = $("#badge-carrito");
+  if (n > 0) {
+    badge.textContent = n;
+    badge.classList.remove("hidden");
+    badge.classList.add("grid");
+  } else {
+    badge.classList.add("hidden");
+    badge.classList.remove("grid");
+  }
+  $("#btn-abrir-carrito").setAttribute("aria-label", `Abrir carrito, ${n} artículos`);
+
+  // Lista del cajón
+  if (n === 0) {
+    $("#carrito-lista").innerHTML = `
+      <div class="grid h-full place-items-center text-center">
+        <div>
+          <i class="fa-solid fa-ghost mb-4 text-4xl text-dim/50" aria-hidden="true"></i>
+          <p class="font-display text-base font-bold text-bone">Carrito vacío</p>
+          <p class="mt-1.5 text-sm text-dim">El Gremio aún no registra pedidos. Visita la tienda y elige tu reliquia.</p>
+          <button type="button" id="btn-ir-tienda" data-cursor
+            class="mt-5 rounded-full border border-cyan-neon/50 px-5 py-2.5 font-code text-[10px] uppercase tracking-[0.25em] text-cyan-neon transition-colors hover:bg-cyan-neon hover:text-void">
+            Ir a la tienda
+          </button>
+        </div>
+      </div>`;
+    $("#btn-ir-tienda").addEventListener("click", () => {
+      cerrarCarrito();
+      location.hash = "#tienda";
+    });
+    $("#carrito-pie").innerHTML = "";
+    return;
+  }
+
+  $("#carrito-lista").innerHTML = `
+    <ul class="space-y-4">
+      ${Object.entries(estado.carrito).map(([id, q]) => {
+        const p = PRODUCTOS.find((x) => x.id === id);
+        if (!p) return "";
+        return `
+        <li class="flex items-start gap-4 rounded-xl border border-white/10 bg-void/50 p-4">
+          <span class="grid size-11 shrink-0 place-items-center rounded-lg border border-white/10 bg-gothic text-bone"><i class="${p.icono}" aria-hidden="true"></i></span>
+          <div class="min-w-0 flex-1">
+            <p class="truncate font-display text-sm font-bold text-bone">${p.nombre}</p>
+            <p class="mt-0.5 font-code text-xs text-crimson-soft">${formatearMXN(p.precio)}</p>
+            <div class="mt-2.5 flex items-center gap-3">
+              <button type="button" data-cantidad="${id}" data-delta="-1" data-cursor aria-label="Quitar una unidad de ${p.nombre}"
+                class="grid size-7 place-items-center rounded-full border border-white/15 text-dim transition-colors hover:border-crimson hover:text-crimson">
+                <i class="fa-solid fa-minus text-[9px]" aria-hidden="true"></i>
+              </button>
+              <span class="font-code text-sm text-bone">${q}</span>
+              <button type="button" data-cantidad="${id}" data-delta="1" data-cursor aria-label="Añadir una unidad de ${p.nombre}"
+                class="grid size-7 place-items-center rounded-full border border-white/15 text-dim transition-colors hover:border-cyan-neon hover:text-cyan-neon">
+                <i class="fa-solid fa-plus text-[9px]" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <p class="font-code text-sm text-bone/85">${formatearMXN(p.precio * q)}</p>
+        </li>`;
+      }).join("")}
+    </ul>`;
+
+  $("#carrito-pie").innerHTML = `
+    <footer class="border-t border-white/10 px-6 py-5">
+      <div class="mb-4 flex items-center justify-between">
+        <span class="font-code text-[11px] uppercase tracking-[0.3em] text-dim">Total</span>
+        <span class="font-display text-2xl font-black text-bone">${formatearMXN(totalCarrito())}</span>
+      </div>
+      ${CONFIG.enlacePago
+        ? `<a href="${CONFIG.enlacePago}" target="_blank" rel="noopener noreferrer" data-cursor
+            class="block w-full rounded-xl bg-crimson py-3.5 text-center font-code text-[11px] font-bold uppercase tracking-[0.25em] text-white transition-all hover:shadow-[0_0_26px_rgba(255,0,85,0.5)]">Finalizar compra</a>`
+        : `<button type="button" id="btn-finalizar" data-cursor
+            class="w-full rounded-xl bg-crimson py-3.5 font-code text-[11px] font-bold uppercase tracking-[0.25em] text-white transition-all hover:shadow-[0_0_26px_rgba(255,0,85,0.5)]">Finalizar pedido</button>`}
+      <p class="mt-3 text-center font-code text-[10px] uppercase tracking-[0.2em] text-dim">
+        <i class="fa-solid fa-floppy-disk mr-1.5" aria-hidden="true"></i> Guardado automático activado
+      </p>
+    </footer>`;
+
+  document.querySelectorAll("[data-cantidad]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.cantidad;
+      const q = (estado.carrito[id] || 0) + Number(btn.dataset.delta);
+      if (q <= 0) delete estado.carrito[id];
+      else estado.carrito[id] = q;
+      guardarCarrito();
+    });
+  });
+  const fin = $("#btn-finalizar");
+  if (fin) fin.addEventListener("click", () => aviso("Pagos en conexión: tu carrito queda guardado en este dispositivo."));
+}
+
+function abrirCarrito() {
+  estado.carritoAbierto = true;
+  document.body.style.overflow = "hidden";
+  const cajon = $("#cajon-carrito");
+  cajon.classList.remove("invisible", "opacity-0");
+  cajon.setAttribute("aria-hidden", "false");
+  $("#panel-cajon").classList.remove("translate-x-full");
+}
+function cerrarCarrito() {
+  estado.carritoAbierto = false;
+  document.body.style.overflow = "";
+  const cajon = $("#cajon-carrito");
+  cajon.classList.add("invisible", "opacity-0");
+  cajon.setAttribute("aria-hidden", "true");
+  $("#panel-cajon").classList.add("translate-x-full");
+}
+
+// --------------------------- FOOTER (redes) ---------------------------------
+function renderRedes() {
+  const REDES = [
+    { icono: "fa-brands fa-spotify", nombre: "Spotify", url: CONFIG.social.spotify },
+    { icono: "fa-brands fa-youtube", nombre: "YouTube", url: CONFIG.social.youtube },
+    { icono: "fa-brands fa-instagram", nombre: "Instagram", url: CONFIG.social.instagram },
+    { icono: "fa-brands fa-x-twitter", nombre: "X", url: CONFIG.social.x },
+  ];
+  $("#redes").innerHTML = REDES.map((r) => r.url
+    ? `<li><a href="${r.url}" target="_blank" rel="noopener noreferrer" aria-label="${r.nombre}" data-cursor
+        class="grid size-11 place-items-center rounded-full border border-white/10 text-dim transition-all duration-300 hover:border-crimson/60 hover:text-crimson hover:shadow-[0_0_18px_rgba(255,0,85,0.3)]"><i class="${r.icono}" aria-hidden="true"></i></a></li>`
+    : `<li><span aria-label="${r.nombre} (próximamente)" title="Próximamente"
+        class="grid size-11 place-items-center rounded-full border border-white/5 text-dim/40"><i class="${r.icono}" aria-hidden="true"></i></span></li>`
+  ).join("");
+}
+</script>
+<script>
+// ============================================================================
+// SISTEMAS DE EFECTOS
+// · Cursor de dos capas (punto directo + anillo con resorte al 15%/frame)
+// · Ondas de radio concéntricas en Canvas 2D (primarias 900ms desde el ratón
+//   con suavizado 3%, ambientales cada 3.5s, táctiles cada 2.4s)
+// · Partículas de luz al hacer clic (Anime.js)
+// · Revelados al scroll (IntersectionObserver), paralaje y tilt (GSAP)
+// · Timeline de entrada del hero (GSAP)
+// ============================================================================
+
+gsap.registerPlugin(ScrollTrigger);
+const reduceMovimiento = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const punteroFino = window.matchMedia("(pointer: fine)").matches;
+
+// ------------------------- 1) CURSOR DE DOS CAPAS ---------------------------
+function iniciarCursor() {
+  if (!punteroFino) return;
+  const dot = $("#cursor-dot");
+  const ring = $("#cursor-ring");
+  document.documentElement.classList.add("custom-cursor");
+
+  let destinoX = window.innerWidth / 2, destinoY = window.innerHeight / 2;
+  let anilloX = destinoX, anilloY = destinoY;
+
+  window.addEventListener("mousemove", (e) => {
+    destinoX = e.clientX; destinoY = e.clientY;
+    // El punto sigue directo, sin delay
+    dot.style.transform = `translate(${destinoX}px, ${destinoY}px)`;
+  }, { passive: true });
+
+  // El anillo persigue con interpolación del 15% por frame (resorte suave)
+  (function tick() {
+    anilloX += (destinoX - anilloX) * 0.15;
+    anilloY += (destinoY - anilloY) * 0.15;
+    ring.style.transform = `translate(${anilloX}px, ${anilloY}px)`;
+    requestAnimationFrame(tick);
+  })();
+
+  // Al entrar/salir de fichas (cualquier elemento con [data-cursor])
+  document.addEventListener("mouseover", (e) => {
+    const objetivo = e.target && e.target.closest ? e.target.closest("[data-cursor]") : null;
+    document.documentElement.classList.toggle("cursor-sobre-ficha", !!objetivo);
+  }, { passive: true });
+  document.addEventListener("mouseout", (e) => {
+    document.documentElement.classList.toggle("cursor-fuera", !e.relatedTarget);
+  }, { passive: true });
+}
+
+// ------------------- 2) ONDAS DE RADIO CONCÉNTRICAS -------------------------
+const COLORES_ONDA = ["#ff0055", "#00e5ff", "#ff3366", "#b3003c", "#00b8d4"];
+
+class Onda {
+  constructor(x, y, maxRadio, opacidadMax, grosor, color) {
+    this.x = x; this.y = y; this.radio = 0;
+    this.maxRadio = maxRadio;
+    this.velocidad = maxRadio / 95; // ≈1.6s de vida en pantalla
+    this.opacidadMax = opacidadMax; this.grosor = grosor; this.color = color;
+    this.vida = 0;
+  }
+  actualizar() {
+    this.radio += this.velocidad;
+    this.vida = this.radio / this.maxRadio;
+    return this.vida < 1;
+  }
+  dibujar(ctx) {
+    // Curva de opacidad: sube rápido hasta el 30% del recorrido y cae suave
+    const t = this.vida;
+    const opacidad = t < 0.3 ? (t / 0.3) * this.opacidadMax : this.opacidadMax * (1 - (t - 0.3) / 0.7);
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radio, 0, Math.PI * 2);
+    ctx.strokeStyle = this.color;
+    ctx.globalAlpha = Math.max(opacidad, 0);
+    ctx.lineWidth = this.grosor;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
+}
+
+function iniciarOndas() {
+  if (reduceMovimiento) return;
+  const canvas = $("#ondas-fondo");
+  const ctx = canvas.getContext("2d");
+  const esTactil = !punteroFino;
+
+  let dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const ajustar = () => {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    canvas.style.width = window.innerWidth + "px";
+    canvas.style.height = window.innerHeight + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+  ajustar();
+  window.addEventListener("resize", ajustar);
+
+  const ondas = [];
+  let indiceColor = 0;
+  const siguienteColor = () => COLORES_ONDA[indiceColor++ % COLORES_ONDA.length];
+
+  // Posición del ratón suavizada al 3% por frame (no tiembla)
+  let ratonX = window.innerWidth / 2, ratonY = window.innerHeight * 0.4;
+  let suaveX = ratonX, suaveY = ratonY;
+  if (!esTactil) {
+    window.addEventListener("mousemove", (e) => { ratonX = e.clientX; ratonY = e.clientY; }, { passive: true });
+  }
+
+  let ultimoPrimaria = 0, ultimoAmbiental = 0, ultimoTactil = 0;
+  let enPausa = false;
+  document.addEventListener("visibilitychange", () => {
+    enPausa = document.hidden;
+    if (!enPausa) ultimoPrimaria = ultimoAmbiental = performance.now();
+  });
+
+  (function bucle(t) {
+    requestAnimationFrame(bucle);
+    if (enPausa) return;
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+    // Glow radial sutil en el punto de origen (la "fuente")
+    if (!esTactil) {
+      suaveX += (ratonX - suaveX) * 0.03;
+      suaveY += (ratonY - suaveY) * 0.03;
+      const glow = ctx.createRadialGradient(suaveX, suaveY, 0, suaveX, suaveY, 60);
+      glow.addColorStop(0, "rgba(255, 0, 85, 0.10)");
+      glow.addColorStop(1, "rgba(255, 0, 85, 0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(suaveX - 60, suaveY - 60, 120, 120);
+      if (t - ultimoPrimaria >= 900) {
+        ondas.push(new Onda(suaveX, suaveY, 280 + Math.random() * 220, 0.18, 1.8, siguienteColor()));
+        ultimoPrimaria = t;
+      }
+    }
+    // Ondas ambientales cerca del centro
+    if (t - ultimoAmbiental >= 3500) {
+      const cx = window.innerWidth / 2 + (Math.random() - 0.5) * window.innerWidth * 0.5;
+      const cy = window.innerHeight / 2 + (Math.random() - 0.5) * window.innerHeight * 0.5;
+      ondas.push(new Onda(cx, cy, 400 + Math.random() * 300, 0.06, 1, siguienteColor()));
+      ultimoAmbiental = t;
+    }
+    // En táctiles no hay ratón: pulsos suaves automáticos cada 2.4s
+    if (esTactil && t - ultimoTactil >= 2400) {
+      const cx = window.innerWidth * (0.2 + Math.random() * 0.6);
+      const cy = window.innerHeight * (0.2 + Math.random() * 0.6);
+      ondas.push(new Onda(cx, cy, 300 + Math.random() * 200, 0.12, 1.4, siguienteColor()));
+      ultimoTactil = t;
+    }
+
+    for (let i = ondas.length - 1; i >= 0; i--) {
+      if (ondas[i].actualizar()) ondas[i].dibujar(ctx);
+      else ondas.splice(i, 1);
+    }
+  })(performance.now());
+}
+
+// ------------------ 3) PARTÍCULAS DE LUZ AL HACER CLIC ----------------------
+function iniciarParticulas() {
+  if (reduceMovimiento) return;
+  const cont = $("#particulas");
+  const COLORES = ["#ff0055", "#00e5ff", "#e2e2e9"];
+  window.addEventListener("pointerdown", (e) => {
+    const total = 14;
+    for (let i = 0; i < total; i++) {
+      const p = document.createElement("span");
+      p.className = "particula";
+      const color = COLORES[i % COLORES.length];
+      p.style.left = e.clientX + "px";
+      p.style.top = e.clientY + "px";
+      p.style.background = color;
+      p.style.boxShadow = `0 0 8px ${color}`;
+      cont.appendChild(p);
+      // Cada partícula sale disparada en un ángulo distinto y se disuelve
+      const angulo = (Math.PI * 2 * i) / total + Math.random() * 0.6;
+      const distancia = 44 + Math.random() * 72;
+      anime({
+        targets: p,
+        translateX: { value: Math.cos(angulo) * distancia, duration: 720, easing: "easeOutExpo" },
+        translateY: { value: Math.sin(angulo) * distancia, duration: 720, easing: "easeOutExpo" },
+        scale: { value: [1, 0.15], duration: 720, easing: "easeInQuad" },
+        opacity: [{ value: 1, duration: 70 }, { value: 0, duration: 640, easing: "easeOutQuad" }],
+        complete: () => p.remove(),
+      });
+    }
+  }, { passive: true });
+}
+
+// --------------------- 4) REVELADOS AL HACER SCROLL -------------------------
+function iniciarRevelados() {
+  const io = new IntersectionObserver((entradas) => {
+    entradas.forEach((entrada) => {
+      if (!entrada.isIntersecting) return;
+      const el = entrada.target;
+      if (reduceMovimiento) { el.classList.add("revelado"); io.unobserve(el); return; }
+
+      // Escalonado para grupos: cada hijo espera su turno
+      let mayorRetardo = 0;
+      if (el.hasAttribute("data-reveal-group")) {
+        Array.from(el.children).forEach((hijo, i) => {
+          const retardo = Math.min(i * 90, 720);
+          hijo.style.transitionDelay = retardo + "ms";
+          mayorRetardo = Math.max(mayorRetardo, retardo);
+        });
+      } else {
+        const retardo = parseFloat(el.dataset.revealDelay || "0");
+        if (retardo > 0) el.style.transitionDelay = retardo + "s";
+      }
+      el.classList.add("revelado");
+
+      // Al terminar el revelado retiramos las transiciones para que no
+      // interfieran con el tilt de GSAP
+      setTimeout(() => {
+        el.style.transition = "none";
+        el.querySelectorAll("*").forEach((h) => {
+          if (h.style.transitionDelay) { h.style.transitionDelay = ""; h.style.transition = "none"; }
+        });
+      }, 1400 + mayorRetardo);
+
+      io.unobserve(el);
+    });
+  }, { rootMargin: "0px 0px -10% 0px", threshold: 0.06 });
+
+  document.querySelectorAll("[data-reveal], [data-reveal-group]").forEach((el) => io.observe(el));
+}
+
+// ---------------- 5) PARALAJE (scrub) + TILT 3D con GSAP --------------------
+function iniciarParalaje() {
+  if (reduceMovimiento) return;
+  gsap.utils.toArray("[data-parallax]").forEach((el) => {
+    const porcentaje = parseFloat(el.dataset.parallax || "10");
+    gsap.fromTo(el,
+      { yPercent: -porcentaje / 2 },
+      {
+        yPercent: porcentaje / 2, ease: "none",
+        scrollTrigger: { trigger: el.closest("section") || el, start: "top bottom", end: "bottom top", scrub: true },
+      });
+  });
+}
+
+function iniciarTilt(raiz) {
+  if (!punteroFino || reduceMovimiento) return;
+  (raiz || document).querySelectorAll("[data-tilt]").forEach((card) => {
+    if (card.dataset.tiltListo) return; // no duplicar oyentes
+    card.dataset.tiltListo = "1";
+    gsap.set(card, { transformPerspective: 900 });
+    card.addEventListener("mousemove", (e) => {
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5;
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      gsap.to(card, { rotateY: px * 9, rotateX: -py * 9, duration: 0.45, ease: "power2.out" });
+    });
+    card.addEventListener("mouseleave", () => {
+      gsap.to(card, { rotateX: 0, rotateY: 0, duration: 0.8, ease: "elastic.out(1, 0.5)" });
+    });
+  });
+}
+
+// -------------------- 6) TIMELINE DE ENTRADA DEL HERO -----------------------
+function iniciarHero() {
+  if (reduceMovimiento) return;
+  const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+  tl.from("[data-hero-portada]", { scale: 1.18, autoAlpha: 0, duration: 1.4, ease: "power2.out" })
+    .from("[data-hero-overline]", { y: 18, autoAlpha: 0, duration: 0.7 }, "-=0.9")
+    .from("[data-hero-titulo]", { y: 54, autoAlpha: 0, duration: 1, clearProps: "transform,opacity,visibility" }, "-=0.5")
+    .from("[data-hero-sub]", { y: 22, autoAlpha: 0, duration: 0.8 }, "-=0.55")
+    .from("[data-hero-btn]", { y: 20, autoAlpha: 0, duration: 0.7, stagger: 0.12 }, "-=0.45")
+    .from("[data-hero-indicador]", { autoAlpha: 0, duration: 0.8 }, "-=0.2");
+}
+
+// ------------------- 7) BARRA DE NAVEGACIÓN + MENÚ MÓVIL --------------------
+function iniciarNav() {
+  const barra = $("#barra-nav");
+  const alScroll = () => {
+    const conScroll = window.scrollY > 24;
+    barra.classList.toggle("bg-void/85", conScroll);
+    barra.classList.toggle("backdrop-blur-md", conScroll);
+    barra.classList.toggle("border-b", conScroll);
+    barra.classList.toggle("border-white/5", conScroll);
+    barra.classList.toggle("bg-transparent", !conScroll);
+  };
+  alScroll();
+  window.addEventListener("scroll", alScroll, { passive: true });
+
+  // Menú móvil
+  const btnMenu = $("#btn-menu");
+  const menu = $("#menu-movil");
+  let menuAbierto = false;
+  const pintarMenu = () => {
+    btnMenu.setAttribute("aria-expanded", String(menuAbierto));
+    btnMenu.setAttribute("aria-label", menuAbierto ? "Cerrar menú" : "Abrir menú");
+    $("#icono-menu").className = `fa-solid ${menuAbierto ? "fa-xmark" : "fa-bars"}`;
+    if (menuAbierto) {
+      menu.classList.remove("invisible", "opacity-0");
+      menu.querySelectorAll(".enlace-menu").forEach((a) => a.classList.remove("translate-y-6", "opacity-0"));
+    } else {
+      menu.classList.add("invisible", "opacity-0");
+      menu.querySelectorAll(".enlace-menu").forEach((a) => a.classList.add("translate-y-6", "opacity-0"));
+    }
+    document.body.style.overflow = menuAbierto ? "hidden" : "";
+  };
+  btnMenu.addEventListener("click", () => { menuAbierto = !menuAbierto; pintarMenu(); });
+  // Al elegir un enlace: cerrar el menú y dejar que el ancla navegue
+  menu.querySelectorAll(".enlace-menu").forEach((a) => {
+    a.addEventListener("click", () => { menuAbierto = false; pintarMenu(); });
+  });
+}
+
+// ------------------- 8) EXTRAS SEGÚN CONFIG (Spotify) -----------------------
+function aplicarConfig() {
+  // Botón de Spotify en el hero
+  if (CONFIG.spotifySencillo !== "") {
+    const a = document.createElement("a");
+    a.href = CONFIG.spotifySencillo;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.setAttribute("data-hero-btn", "");
+    a.setAttribute("data-cursor", "");
+    a.className = "inline-flex items-center gap-2 rounded-full border border-white/15 px-5 py-3 font-code text-[11px] uppercase tracking-[0.2em] text-dim transition-colors hover:border-white/40 hover:text-bone";
+    a.innerHTML = `<i class="fa-brands fa-spotify" aria-hidden="true"></i> Spotify`;
+    $("#botones-hero").appendChild(a);
+  }
+  // Embebido del reproductor en la Sala de Escucha
+  if (CONFIG.spotifyEmbed !== "") {
+    $("#spotify-embed-slot").innerHTML = `
+      <div class="overflow-hidden rounded-2xl border border-white/10" data-reveal>
+        <iframe title="Reproductor de Spotify — Requiem: Binary" src="${CONFIG.spotifyEmbed}"
+          width="100%" height="352" frameborder="0"
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      </div>`;
+  }
+}
+
+// ============================================================================
+// ARRANQUE — primero se renderiza todo el contenido, luego los efectos
+// ============================================================================
+document.addEventListener("DOMContentLoaded", () => {
+  // Render inicial de todas las secciones
+  htmlCabecera("cabecera-escucha", "BLOQUE 02 — LA SALA DE ESCUCHA", "Sala de Escucha",
+    "El álbum completo con sus notas de producción: escalas, compases y arreglos que Spotify no te cuenta. Toca una pista para abrir su ficha.");
+  htmlCabecera("cabecera-archivo", "BLOQUE 03 — EL ARCHIVO BINARY", "El Archivo Binary",
+    "Todo lo que la música cuenta y no alcanza a decir: los héroes, sus armas y emblemas, los villanos y los reinos que se cruzaron en la Noche del Doble Eclipse.");
+  htmlCabecera("cabecera-cripto", "BLOQUE 04 — INTERACTIVO", "El Criptograma de Yumeki",
+    "Una transmisión cifrada del Gremio Lumen acaba de llegar desde Albion. Gira la clave, rompe el cifrado... y firma el juramento.");
+  htmlCabecera("cabecera-tienda", "BLOQUE 05 — LA TIENDA DEL GREMIO", "Tienda del Gremio",
+    "Objetos oficiales del universo: ediciones del álbum, arte impreso y reliquias inspiradas en las armas de Yumeki y Kageki. Tu carrito se guarda solo.");
+  htmlCabecera("cabecera-proyectos", "BLOQUE 06 — PRÓXIMOS PROYECTOS", "El Siguiente Volumen",
+    "El universo no termina en el álbum: continúa en una novela visual donde tú decides cómo se cruzan los reinos.");
+
+  renderCinta();
+  renderSencillo();
+  renderControlLetras();
+  renderTracklist();
+  renderArchivo();
+  iniciarCriptograma();
+  renderTienda();
+  renderNovela();
+  renderCarrito();
+  renderRedes();
+  aplicarConfig();
+
+  // Oyentes del carrito
+  $("#btn-abrir-carrito").addEventListener("click", abrirCarrito);
+  $("#btn-cerrar-carrito").addEventListener("click", cerrarCarrito);
+  $("#fondo-cajon").addEventListener("click", cerrarCarrito);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && estado.carritoAbierto) cerrarCarrito();
+  });
+
+  // Efectos
+  iniciarNav();
+  iniciarCursor();
+  iniciarOndas();
+  iniciarParticulas();
+  iniciarRevelados();
+  iniciarParalaje();
+  iniciarTilt();
+  iniciarHero();
+  setTimeout(() => ScrollTrigger.refresh(), 350);
+  sitioIniciado = true;
+});
+</script>
+</body>
+</html>
